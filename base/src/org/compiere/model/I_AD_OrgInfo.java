@@ -22,7 +22,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for AD_OrgInfo
  *  @author Adempiere (generated) 
- *  @version Release 3.9.2
+ *  @version Release 3.9.3
  */
 public interface I_AD_OrgInfo 
 {
@@ -106,6 +106,19 @@ public interface I_AD_OrgInfo
 	public int getC_Location_ID();
 
 	public I_C_Location getC_Location() throws RuntimeException;
+
+    /** Column name CorporateBrandingImage_ID */
+    public static final String COLUMNNAME_CorporateBrandingImage_ID = "CorporateBrandingImage_ID";
+
+	/** Set Corporate Branding Image.
+	  * Corporate Branding Image
+	  */
+	public void setCorporateBrandingImage_ID (int CorporateBrandingImage_ID);
+
+	/** Get Corporate Branding Image.
+	  * Corporate Branding Image
+	  */
+	public int getCorporateBrandingImage_ID();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";

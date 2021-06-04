@@ -34,6 +34,7 @@ import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.TimeUtil;
+import org.compiere.util.Util;
 
 
 /**
@@ -67,6 +68,13 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 	 */
 	static public MBankStatementLine addPayment(MPayment payment)
 	{
+		//	Validate if exist on a bank statement
+		MBankStatementLine bankStatementLine = payment.getBankStatementLine();
+		if(bankStatementLine != null
+				&& bankStatementLine.getC_BankStatement_ID() > 0) {
+			return bankStatementLine;
+		}
+		//	Add
 		StringBuilder whereClause = new StringBuilder();
 		whereClause.append(MBankStatement.COLUMNNAME_C_BankAccount_ID).append("=? AND ")
 				.append("TRUNC(").append(MBankStatement.COLUMNNAME_StatementDate).append(",'DD')=? AND ")
@@ -89,13 +97,14 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 			bankStatement.saveEx();
 		}
 
-		MBankStatementLine bankStatementLine = new MBankStatementLine(bankStatement);
+		bankStatementLine = new MBankStatementLine(bankStatement);
 		bankStatementLine.setPayment(payment);
 		bankStatementLine.setStatementLineDate(payment.getDateAcct());
 		bankStatementLine.setDateAcct(payment.getDateAcct());
 		bankStatementLine.saveEx();
 		return bankStatementLine;
 	}
+	
 	/**
 	 * 
 	 */
@@ -442,7 +451,48 @@ public class MBankStatement extends X_C_BankStatement implements DocAction
 		if (!isApproved())
 			approveIt();
 		log.info("completeIt - " + toString());
-		
+		StringBuffer linesWithoutReference = new StringBuffer();
+		Arrays.asList(getLines(true)).stream()
+			.filter(statementLine -> statementLine.getC_Payment_ID() == 0)
+			.forEach(statementLine -> {
+				if(linesWithoutReference.length() > 0) {
+					linesWithoutReference.append(Env.NL);
+				}
+				//	Add
+				StringBuffer displayValue = new StringBuffer();
+				displayValue.append(statementLine.getLine());
+				//	Reference No
+				if(!Util.isEmpty(statementLine.getReferenceNo())) {
+					displayValue.append(" - @ReferenceNo@: ").append(statementLine.getReferenceNo());
+				}
+				//	Memo
+				if(!Util.isEmpty(statementLine.getMemo())) {
+					displayValue.append(" - @Memo@: ").append(statementLine.getMemo());
+				}
+				//	EFT Check No
+				if(!Util.isEmpty(statementLine.getEftCheckNo())) {
+					displayValue.append(" - @EftCheckNo@: ").append(statementLine.getEftCheckNo());
+				}
+				if(!Util.isEmpty(statementLine.getEftMemo())) {
+					displayValue.append(" - @EftMemo@: ").append(statementLine.getEftMemo());
+				}
+				//	Add amount
+				if (statementLine.getTrxAmt().compareTo(Env.ZERO) != 0) {
+					displayValue.append(" - @TrxAmt@: ").append(DisplayType.getNumberFormat(DisplayType.Amount).format(statementLine.getTrxAmt()));
+				}
+				if (statementLine.getChargeAmt().compareTo(Env.ZERO) != 0) {
+					displayValue.append(" - @ChargeAmt@: ").append(DisplayType.getNumberFormat(DisplayType.Amount).format(statementLine.getChargeAmt()));
+				}
+				if (statementLine.getInterestAmt().compareTo(Env.ZERO) != 0) {
+					displayValue.append(" - @InterestAmt@: ").append(DisplayType.getNumberFormat(DisplayType.Amount).format(statementLine.getInterestAmt()));
+				}
+				//	Add info
+				linesWithoutReference.append(displayValue);
+		});
+		//	Validate
+		if(linesWithoutReference.length() > 0) {
+			throw new AdempiereException("@Error@" + Env.NL + " @C_Payment_ID@ @NotFound@ " + Env.NL + linesWithoutReference.toString());
+		}
 		//	Set Payment reconciled
 		MBankStatementLine[] lines = getLines(false);
 		for (int i = 0; i < lines.length; i++)

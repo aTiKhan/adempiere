@@ -22,14 +22,12 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MInvoiceLine;
 import org.compiere.model.MOrder;
 import org.compiere.model.MOrderLine;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
-import org.compiere.print.MPrintFormat;
 import org.eevolution.model.MWMInOutBound;
 import org.eevolution.model.MWMInOutBoundLine;
 
@@ -79,21 +77,21 @@ public class GenerateInvoiceInOutBound extends GenerateInvoiceInOutBoundAbstract
 	private void createInvoice(MWMInOutBoundLine outboundLine) {
 		if (outboundLine.getC_OrderLine_ID() > 0) {
 			MOrderLine orderLine = outboundLine.getOrderLine();
-			if (orderLine.getQtyOrdered().subtract(orderLine.getQtyInvoiced()).subtract(outboundLine.getMovementQty()).signum() < 0) {
+			if (orderLine.getQtyOrdered().subtract(orderLine.getQtyInvoiced()).subtract(outboundLine.getPickedQty()).signum() < 0) {
 				return;
 			}
 
-			BigDecimal qtyInvoiced = outboundLine.getMovementQty();
+			BigDecimal qtyInvoiced = outboundLine.getPickedQty();
 			MInvoice invoice = getInvoice(orderLine, outboundLine.getParent());
 			MInvoiceLine invoiceLine = new MInvoiceLine(outboundLine.getCtx(), 0 , outboundLine.get_TrxName());
-			invoiceLine.setC_Invoice_ID(invoice.getC_Invoice_ID());
-			invoiceLine.setM_Product_ID(outboundLine.getM_Product_ID());
-			invoiceLine.setC_UOM_ID(outboundLine.getC_UOM_ID());
-			//	
+			invoiceLine.setOrderLine(orderLine);
+			// Set Shipment Line
+			if (outboundLine.getM_InOutLine_ID() > 0)
+				invoiceLine.setM_InOutLine_ID(outboundLine.getM_InOutLine_ID());
+			invoiceLine.setC_Invoice_ID(invoice.get_ID());
 			invoiceLine.setQtyEntered(qtyInvoiced);
 			invoiceLine.setQtyInvoiced(qtyInvoiced);
-			invoiceLine.setC_OrderLine_ID(orderLine.getC_OrderLine_ID());
-			invoiceLine.setWM_InOutBoundLine_ID(outboundLine.getWM_InOutBoundLine_ID());
+			invoiceLine.setWM_InOutBoundLine_ID(outboundLine.get_ID());
 			invoiceLine.saveEx();
 		}
 	}
@@ -105,7 +103,12 @@ public class GenerateInvoiceInOutBound extends GenerateInvoiceInOutBoundAbstract
 	 * @return MInOut return the Shipment header
 	 */
 	private MInvoice getInvoice(MOrderLine orderLine, MWMInOutBound outbound) {
-		MInvoice invoice = invoices.get(orderLine.getC_Order_ID());
+		int key = orderLine.getC_Order_ID();
+		if(isConsolidateDocument()) {
+			key = orderLine.getC_BPartner_ID();
+		}
+		//	
+		MInvoice invoice = invoices.get(key);
 		if(invoice != null)
 			return invoice;
 
@@ -117,7 +120,7 @@ public class GenerateInvoiceInOutBound extends GenerateInvoiceInOutBoundAbstract
 		invoice.setIsSOTrx(true);
 		invoice.saveEx();
 
-		invoices.put(order.getC_Order_ID(), invoice);
+		invoices.put(key, invoice);
 		return invoice;
 	}
 	

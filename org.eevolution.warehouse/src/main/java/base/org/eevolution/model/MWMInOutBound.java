@@ -33,8 +33,11 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
+import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.I_M_InOut;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
@@ -210,7 +213,7 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 		
 		MDocType documentType = MDocType.get(getCtx(), getC_DocType_ID());
 		//	Std Period open?
-		if (!MPeriod.isOpen(getCtx(), getDateTrx(), documentType.getDocBaseType(), getAD_Org_ID())){
+		if (!MPeriod.isOpen(getCtx(), isSOTrx() ? getPickDate() : getDateTrx(), documentType.getDocBaseType(), getAD_Org_ID())){
 			m_processMsg = "@PeriodClosed@";
 			return DocAction.STATUS_Invalid;
 		}
@@ -352,6 +355,24 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 	}
 	
 	/**
+	 * reverse generated receipt
+	 */
+	private void reverseReceipt() {
+		new Query(getCtx(), I_M_InOut.Table_Name, "DocStatus = 'CO' "
+				+ "AND EXISTS(SELECT 1 FROM M_InOutLine iol "
+				+ "		INNER JOIN WM_InOutBoundLine iobl ON(iobl.WM_InOutBoundLine_ID = iol.WM_InOutBoundLine_ID) "
+				+ "		WHERE iobl.WM_InOutBound_ID = ?)", get_TrxName())
+			.setParameters(getWM_InOutBound_ID())
+			.<MInOut>list()
+			.forEach(receipt -> {
+				if(!receipt.processIt(MInOut.DOCACTION_Reverse_Correct)) {
+					throw new AdempiereException("@Error@ " + receipt.getProcessMsg());
+				}
+				receipt.saveEx();
+			});	
+	}
+	
+	/**
 	 * Generate Receipt from Express receipt
 	 */
 	private void generateReceipt() {
@@ -361,10 +382,11 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 			// Generate Shipment based on Outbound Order
 			if (inboundLine.getC_OrderLine_ID() > 0) {
 				MOrderLine orderLine = inboundLine.getOrderLine();
-				if (inboundLine.getMovementQty().subtract(orderLine.getQtyDelivered()).signum() <= 0)
+				BigDecimal orderedAvailable = orderLine.getQtyOrdered().subtract(orderLine.getQtyDelivered());
+				if (orderedAvailable.subtract(inboundLine.getMovementQty()).signum() < 0)
 					return;
 
-				BigDecimal qtyToReceipt = inboundLine.getMovementQty().subtract(orderLine.getQtyDelivered());
+				BigDecimal qtyToReceipt = inboundLine.getMovementQty();
 				MInOut receipt = receipts.get(orderLine.getC_Order_ID());
 				if(receipt == null) {
 					receipt = createReceipt(orderLine, inboundLine.getParent());
@@ -385,6 +407,7 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 				receiptLine.setM_Shipper_ID(inboundLine.getM_Shipper_ID());
 				receiptLine.setM_FreightCategory_ID(inboundLine.getM_FreightCategory_ID());
 				receiptLine.setFreightAmt(inboundLine.getFreightAmt());
+				receiptLine.setWM_InOutBoundLine_ID(inboundLine.getWM_InOutBoundLine_ID());
 				receiptLine.saveEx();
 			}
 		}
@@ -392,7 +415,6 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 		receipts.entrySet().stream().filter(entry -> entry != null).forEach(entry -> {
 			MInOut shipment = entry.getValue();
 			shipment.setDocAction(getDocAction());
-			shipment.processIt(getDocAction());
 			if (!shipment.processIt(getDocAction())) {
 				log.warning("@ProcessFailed@ :" + shipment.getDocumentInfo());
 			}
@@ -458,7 +480,23 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_VOID);
 		if (m_processMsg != null)
 			return false;
+		getLines(true, null)
+				.forEach(inoutLine -> {
+					if (inoutLine.getMovementQty().signum() != 0) {
+
+						inoutLine.setDescription(Optional.ofNullable(inoutLine.getDescription()).orElse("")
+								+ " " + Msg.getMsg(getCtx(), "Voided") + " @MovementQty@ = (" + inoutLine.getMovementQty() + ")");
+						inoutLine.setMovementQty(BigDecimal.ZERO);
+						inoutLine.setProcessed(true);
+						inoutLine.saveEx();
+					}
+					//AZ Goodwill
+				});
 		addDescription(Msg.getMsg(getCtx(), "Voided"));
+		//	Reverse receipt
+		if(!isSOTrx()) {
+			reverseReceipt();
+		}
 		// After Void
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_AFTER_VOID);
 		if (m_processMsg != null)
@@ -492,6 +530,17 @@ public class MWMInOutBound extends X_WM_InOutBound implements DocAction, DocOpti
 		m_processMsg = ModelValidationEngine.get().fireDocValidate(this,ModelValidator.TIMING_BEFORE_CLOSE);
 		if (m_processMsg != null)
 			return false;
+
+		getLines(true, null)
+				.forEach(inoutLine -> {
+					if (inoutLine.getMovementQty().compareTo(inoutLine.getPickedQty()) != 0) {
+						inoutLine.setDescription(Optional.ofNullable(inoutLine.getDescription()).orElse("")
+								+ " " + Msg.getMsg(getCtx(), "@closed@ @MovementQty@ = (" + inoutLine.getMovementQty() + ")"));
+						inoutLine.setMovementQty(inoutLine.getPickedQty());
+						inoutLine.setProcessed(true);
+						inoutLine.saveEx();
+					}
+				});
 		
 		setProcessed(true);
 		setDocAction(DOCACTION_None);

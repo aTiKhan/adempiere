@@ -74,7 +74,7 @@ import org.zkoss.zul.Separator;
  *      <li> FR [ 1585 ] Loan Simulator
  *		@see https://github.com/adempiere/adempiere/issues/1585
  */
-public class WLoanSimulator extends LoanSimulator
+public class WLoanSimulator extends org.spin.form.LoanSimulator
 	implements IFormController, EventListener, ValueChangeListener {
 	
 	private CustomForm form = new CustomForm();
@@ -388,7 +388,7 @@ public class WLoanSimulator extends LoanSimulator
 	 */
 	private void reloadFinancialProductInfo() {
 		startDate = (Timestamp) (startDateField.getValue() != null? startDateField.getValue(): new Timestamp(System.currentTimeMillis()));
-		MFMProduct financialProduct = MFMProduct.getById(Env.getCtx(), financialProductId);
+		MFMProduct financialProduct = MFMProduct.getById(Env.getCtx(), financialProductId, null);
 		if(financialProduct != null) {
 			isDueFixed = financialProduct.get_ValueAsBoolean("IsDueFixed");
 			//	Currency

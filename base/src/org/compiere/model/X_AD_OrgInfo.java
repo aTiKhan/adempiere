@@ -22,14 +22,14 @@ import java.util.Properties;
 
 /** Generated Model for AD_OrgInfo
  *  @author Adempiere (generated) 
- *  @version Release 3.9.2 - $Id$ */
+ *  @version Release 3.9.3 - $Id$ */
 public class X_AD_OrgInfo extends PO implements I_AD_OrgInfo, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20190926L;
+	private static final long serialVersionUID = 20201119L;
 
     /** Standard Constructor */
     public X_AD_OrgInfo (Properties ctx, int AD_OrgInfo_ID, String trxName)
@@ -149,6 +149,29 @@ public class X_AD_OrgInfo extends PO implements I_AD_OrgInfo, I_Persistent
 	public int getC_Location_ID () 
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_C_Location_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Corporate Branding Image.
+		@param CorporateBrandingImage_ID 
+		Corporate Branding Image
+	  */
+	public void setCorporateBrandingImage_ID (int CorporateBrandingImage_ID)
+	{
+		if (CorporateBrandingImage_ID < 1) 
+			set_Value (COLUMNNAME_CorporateBrandingImage_ID, null);
+		else 
+			set_Value (COLUMNNAME_CorporateBrandingImage_ID, Integer.valueOf(CorporateBrandingImage_ID));
+	}
+
+	/** Get Corporate Branding Image.
+		@return Corporate Branding Image
+	  */
+	public int getCorporateBrandingImage_ID () 
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_CorporateBrandingImage_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();

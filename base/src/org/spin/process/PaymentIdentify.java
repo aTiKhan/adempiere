@@ -17,11 +17,15 @@
 
 package org.spin.process;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.I_C_Payment;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
+import org.compiere.model.MCurrency;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPayment;
 import org.compiere.model.PO;
@@ -37,10 +41,19 @@ import org.compiere.util.Msg;
 public class PaymentIdentify extends PaymentIdentifyAbstract {
 
 	@Override
-	protected String doIt() throws Exception {
+	protected void prepare() {
+		super.prepare();
 		if(getRecord_ID() == 0) {
 			throw new AdempiereException("@Record_ID@ @NotFound@");
 		}
+		//	Validate transaction date
+		if(getDateTrx() == null) {
+			setDateTrx(new Timestamp(System.currentTimeMillis()));
+		}
+	}
+	
+	@Override
+	protected String doIt() throws Exception {
 		//	Unidentified payment
 		MPayment unidentifiedPayment = new MPayment(getCtx(), getRecord_ID(), get_TrxName());
 		if(!unidentifiedPayment.isUnidentifiedPayment()
@@ -65,23 +78,29 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 			identifiedPayment = new MPayment(getCtx(), getRelatedPaymentId(), get_TrxName());
 			//	Receipt
 			if(identifiedPayment.isReceipt() != unidentifiedPayment.isReceipt()) {
-				throw new AdempiereException("@IsReceipt@ @Mismatch@");
+				throw new AdempiereException("@IsReceipt@ @Mismatched@");
 			}
 			//	Bank Account
 			if(identifiedPayment.getC_BankAccount_ID() != unidentifiedPayment.getC_BankAccount_ID()) {
-				throw new AdempiereException("@C_BankAccount_ID@ @Mismatch@");
+				throw new AdempiereException("@C_BankAccount_ID@ @Mismatched@");
 			}
 			//	Currency
 			if(identifiedPayment.getC_Currency_ID() != unidentifiedPayment.getC_Currency_ID()) {
-				throw new AdempiereException("@C_Currency_ID@ @Mismatch@");
+				throw new AdempiereException("@C_Currency_ID@ @Mismatched@");
 			}
+			int currencyId = identifiedPayment.getC_Currency_ID();
+			if(currencyId == 0) {
+				currencyId = identifiedPayment.getC_BankAccount().getC_Currency_ID();
+			}
+			int precision = MCurrency.get(getCtx(), identifiedPayment.getC_Currency_ID()).getStdPrecision();
 			//	Amount
-			if(!identifiedPayment.getPayAmt().equals(unidentifiedPayment.getPayAmt())) {
-				throw new AdempiereException("@PayAmt@ @Mismatch@");
+			if(!identifiedPayment.getPayAmt().setScale(precision, BigDecimal.ROUND_HALF_DOWN)
+					.equals(unidentifiedPayment.getPayAmt().setScale(precision, BigDecimal.ROUND_HALF_DOWN))) {
+				throw new AdempiereException("@PayAmt@ @Mismatched@");
 			}
 			//	Document Status
 			if(!identifiedPayment.getDocStatus().equals(MPayment.STATUS_Completed)) {
-				throw new AdempiereException("@PayAmt@ @Mismatch@");
+				throw new AdempiereException("@DocStatus@ @Mismatched@");
 			}
 		} else {
 			identifiedPayment = new MPayment(getCtx(), 0, get_TrxName());
@@ -93,7 +112,6 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 			identifiedPayment.setC_Charge_ID(-1);
 			identifiedPayment.setC_Invoice_ID(-1);
 			identifiedPayment.setC_Order_ID(-1);
-			identifiedPayment.setIsReconciled(false);
 			//	Order
 			if(getOrderId() != 0) {
 				identifiedPayment.setC_Order_ID(getOrderId());
@@ -107,6 +125,7 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 			identifiedPayment.processIt(MPayment.DOCACTION_Complete);
 			identifiedPayment.saveEx();
 		}
+		identifiedPayment.setIsReconciled(true);
 		identifiedPayment.setRef_Payment_ID(unidentifiedPayment.getC_Payment_ID());
 		identifiedPayment.saveEx();
 		//	Create reversed for Unidentified
@@ -114,10 +133,12 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 		PO.copyValues(unidentifiedPayment, reversePayment);
 		//	
 		reversePayment.setRef_Payment_ID(unidentifiedPayment.getC_Payment_ID());
-		reversePayment.setIsReconciled(false);
+		reversePayment.setIsReconciled(unidentifiedPayment.isReconciled());
 		reversePayment.setIsUnidentifiedPayment(true);
 		reversePayment.setIsReceipt(!unidentifiedPayment.isReceipt());
 		reversePayment.setPayAmt(reversePayment.getPayAmt());
+		reversePayment.setDateTrx(getDateTrx());
+		reversePayment.setDateAcct(getDateTrx());
 		//	Get from organization
 		MOrgInfo organizationInfo = MOrgInfo.get(getCtx(), reversePayment.getAD_Org_ID(), get_TrxName());
 		if(organizationInfo.getUnidentifiedDocumentType(reversePayment.isReceipt()) != 0) {
@@ -144,7 +165,7 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 		MAllocationHdr allocationHdr = new MAllocationHdr (getCtx(), false, getDateTrx(), identifiedPayment.getC_Currency_ID(),
 				Msg.translate(getCtx(), "C_Payment_ID")	+ ": " + unidentifiedPayment.getDocumentNo(), get_TrxName());
 		allocationHdr.setAD_Org_ID(identifiedPayment.getAD_Org_ID());
-		allocationHdr.setDateAcct(identifiedPayment.getDateAcct());
+		allocationHdr.setDateAcct(getDateTrx());
 		allocationHdr.saveEx(get_TrxName());
 
 		//	Original Allocation

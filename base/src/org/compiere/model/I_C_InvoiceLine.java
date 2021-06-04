@@ -22,7 +22,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for C_InvoiceLine
  *  @author Adempiere (generated) 
- *  @version Release 3.9.2
+ *  @version Release 3.9.3
  */
 public interface I_C_InvoiceLine 
 {
@@ -313,6 +313,17 @@ public interface I_C_InvoiceLine
 
 	public org.compiere.model.I_C_UOM getC_UOM() throws RuntimeException;
 
+    /** Column name DD_FreightLine_ID */
+    public static final String COLUMNNAME_DD_FreightLine_ID = "DD_FreightLine_ID";
+
+	/** Set Order Freight Line	  */
+	public void setDD_FreightLine_ID (int DD_FreightLine_ID);
+
+	/** Get Order Freight Line	  */
+	public int getDD_FreightLine_ID();
+
+	public org.eevolution.model.I_DD_FreightLine getDD_FreightLine() throws RuntimeException;
+
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
 
@@ -325,6 +336,17 @@ public interface I_C_InvoiceLine
 	  * Optional short description of the record
 	  */
 	public String getDescription();
+
+    /** Column name FM_Amortization_ID */
+    public static final String COLUMNNAME_FM_Amortization_ID = "FM_Amortization_ID";
+
+	/** Set Loan Amortization	  */
+	public void setFM_Amortization_ID (int FM_Amortization_ID);
+
+	/** Get Loan Amortization	  */
+	public int getFM_Amortization_ID();
+
+	public org.spin.model.I_FM_Amortization getFM_Amortization() throws RuntimeException;
 
     /** Column name GenerateTo */
     public static final String COLUMNNAME_GenerateTo = "GenerateTo";
