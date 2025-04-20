@@ -19,11 +19,16 @@ package org.compiere.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.X_CM_NewsItem;
+
 /**
  * News ItemModel
  * 
  * @author Yves Sandfort
  * @version $Id$
+ * @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class MNewsItem extends X_CM_NewsItem
 {

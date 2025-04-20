@@ -10,11 +10,11 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 
+import org.adempiere.core.domains.models.X_AD_Package_Exp_Detail;
 import org.adempiere.pipo.IDFinder;
 import org.adempiere.pipo.PackIn;
 import org.adempiere.pipo.handler.PrintFormatElementHandler;
 import org.adempiere.util.DateUtil;
-import org.compiere.model.X_AD_Package_Exp_Detail;
 import org.compiere.print.MPrintFormat;
 import org.compiere.print.ReportEngine;
 import org.spin.util.XMLUtils;
@@ -44,7 +44,7 @@ public class ImpExpUtil {
 			SAXTransformerFactory tf_menu = (SAXTransformerFactory) SAXTransformerFactory.newInstance();
 			//	Default features
 			XMLUtils.setDefaultFeatures(tf_menu);
-			tf_menu.setAttribute("indent-number", new Integer(4));
+			tf_menu.setAttribute("indent-number", Integer.valueOf(4));
 			TransformerHandler packOutDocument = tf_menu.newTransformerHandler();		
 			Transformer serializer_document = packOutDocument.getTransformer();		
 			serializer_document.setOutputProperty(OutputKeys.ENCODING,"ISO-8859-1");		

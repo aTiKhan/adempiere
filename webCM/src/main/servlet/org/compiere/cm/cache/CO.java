@@ -13,7 +13,7 @@
  * For the text or an alternative of this public license, you may reach us    *
  * ComPiere, Inc., 2620 Augustine Dr. #245, Santa Clara, CA 95054, USA        *
  * or via info@compiere.org or http://www.compiere.org/license.html           *
- *****************************************************************************/
+ ******************************************************************************/
 package org.compiere.cm.cache;
 
 import java.util.Collections;
@@ -31,6 +31,10 @@ import org.compiere.util.CLogger;
  *
  *  @author Yves Sandfort
  *  @version  $Id$
+ *
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ *		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class CO {
 
@@ -71,7 +75,7 @@ public class CO {
 	 */
 	public void put(String ID, Object thisObject) {
 		cache.put(ID,thisObject);
-		Long thisLong = new Long(new Date().getTime());
+		Long thisLong = Long.valueOf(new Date().getTime());
 		cacheUsage.put(ID, thisLong);
 		if (cacheUsage.size()>cacheSize-1) {
 			cleanUp();
@@ -99,7 +103,7 @@ public class CO {
 	 * 	get key enumeration
 	 *	@return key enumeration
 	 */
-	public Enumeration getKeys() {
+	public Enumeration<?> getKeys() {
 		return cache.keys();
 	}
 
@@ -107,7 +111,7 @@ public class CO {
 		Vector vecKeys = new Vector(); 
 		//Gets keys from hashtable 
 
-		Enumeration myEnum = cacheUsage.elements();
+		Enumeration<?> myEnum = cacheUsage.elements();
 
 		while (myEnum.hasMoreElements()) 
 		{ 
@@ -123,7 +127,7 @@ public class CO {
 		{
 			String value = vecKeys.get(i).toString();
 			String key = "";
-			Enumeration keys = cacheUsage.keys();
+			Enumeration<?> keys = cacheUsage.keys();
 			while (keys.hasMoreElements() && key.equals("")) {
 				String thisKey = keys.nextElement().toString();
 				String tempValue = cacheUsage.get(thisKey).toString(); 
@@ -145,7 +149,7 @@ public class CO {
 	 *	@param ID
 	 */
 	public void use(int ID) {
-		Long thisLong = new Long(new java.util.Date().getTime());
+		Long thisLong = Long.valueOf(new java.util.Date().getTime());
 		cacheUsage.put("" + ID, thisLong);
 	}
 	
@@ -154,7 +158,7 @@ public class CO {
 	 *	@param ID
 	 */
 	public void use(String ID) {
-		Long thisLong = new Long(new java.util.Date().getTime());
+		Long thisLong = new java.util.Date().getTime();
 		cacheUsage.put(ID, thisLong);
 	}
 	
@@ -173,11 +177,10 @@ public class CO {
      */
     public String show() {
     		StringBuffer tStrHTML = new StringBuffer();
-		Enumeration thisEnum = null;
 		tStrHTML.append("      <size>" + this.getSize() + "</size>\n");
-		thisEnum = this.getKeys();
+		Enumeration<?> thisEnum = this.getKeys();
 		while (thisEnum.hasMoreElements()) { 
-			tStrHTML.append("      <item>" + thisEnum.nextElement() + "</item>\n"); 
+			tStrHTML.append("      <item>" + thisEnum.nextElement().toString() + "</item>\n"); 
 		} 
 		return tStrHTML.toString();
     }

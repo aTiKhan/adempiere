@@ -88,25 +88,27 @@ public class ModelClassGenerator
 		StringBuffer mandatory = new StringBuffer();
 		StringBuffer sb = createColumns(AD_Table_ID, mandatory);
 		// Header
-		String tableName = createHeader(table, sb, mandatory, packageName);
+		String className = createHeader(table, sb, mandatory, packageName);
 		// Save
 		if ( ! directory.endsWith(File.separator) )
 			directory += File.separator;
 		//	Write to file "X_" class
-		writeToFile (sb, directory + tableName + ".java");
+		writeToFile (sb, directory + className + ".java");
 		//	Create Document Class
-		if(table.isDocument()) {
+		/*if(table.isDocument()) {
 			sb = new StringBuffer();
-			tableName = createHeaderDocument(table, tableName, sb, packageName);
-			//	Write to file "M" class
-			String fileName = directory + tableName + ".java";
-			//	Validate if exists
-			File out = new File (fileName);
-			if(!out.exists()) {
-				//	Create a File
-				writeToFile (sb, fileName);
+			className = createHeaderDocument(table, className, sb, packageName);
+			if(className != null) {
+				//	Write to file "M" class
+				String fileName = directory + className + ".java";
+				//	Validate if exists
+				File out = new File (fileName);
+				if(!out.exists()) {
+					//	Create a File
+					writeToFile (sb, fileName);
+				}
 			}
-		}
+		}*/
 	}
 
 	public static final String NL = "\n";
@@ -152,8 +154,13 @@ public class ModelClassGenerator
 
 		addImportClass(java.util.Properties.class);
 		addImportClass(java.sql.ResultSet.class);
-		if (!packageName.equals("org.compiere.model"))
-			addImportClass("org.compiere.model.*");
+		addImportClass(org.compiere.model.PO.class);
+		addImportClass(org.compiere.model.I_Persistent.class);
+		addImportClass(org.compiere.model.POInfo.class);
+		addImportClass(org.compiere.model.MTable.class);
+		
+		if (!packageName.equals("org.adempiere.core.domains.models"))
+			addImportClass("org.adempiere.core.domains.models.*");
 		createImports(start);
 		//	Class
 		start.append("/** Generated Model for ").append(tableName).append(NL)
@@ -264,7 +271,11 @@ public class ModelClassGenerator
 	private String createHeaderDocument(MTable p_Table, String p_ParentClassName, StringBuffer sb, String packageName) {
 		String tableName = p_Table.getTableName();
 		String keyColumn = tableName + "_ID";
-		String className = "M" + tableName.replaceAll("_", "");
+		Class<?> clazz = MTable.getClass(tableName);
+		if(clazz == null) {
+			return null;
+		}
+		String className = clazz.getSimpleName();
 		//
 		StringBuffer start = new StringBuffer ()
 			.append (ModelInterfaceGenerator.COPY)
@@ -281,8 +292,8 @@ public class ModelClassGenerator
 		addImportClass(org.compiere.process.DocumentEngine.class);
 		addImportClass(org.compiere.util.DB.class);
 		//	
-		if (!packageName.equals("org.compiere.model"))
-			addImportClass("org.compiere.model.*");
+		if (!packageName.equals("org.adempiere.core.domains.models"))
+			addImportClass("org.adempiere.core.domains.models.*");
 		createImports(start);
 		//	Class
 		start.append("/** Generated Model for ").append(tableName).append(NL)

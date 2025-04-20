@@ -17,11 +17,11 @@
 
 package org.spin.process;
 
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 
+import org.adempiere.core.domains.models.I_C_Payment;
 import org.adempiere.exceptions.AdempiereException;
-import org.compiere.model.I_C_Payment;
 import org.compiere.model.MAllocationHdr;
 import org.compiere.model.MAllocationLine;
 import org.compiere.model.MBPartner;
@@ -94,8 +94,8 @@ public class PaymentIdentify extends PaymentIdentifyAbstract {
 			}
 			int precision = MCurrency.get(getCtx(), identifiedPayment.getC_Currency_ID()).getStdPrecision();
 			//	Amount
-			if(!identifiedPayment.getPayAmt().setScale(precision, BigDecimal.ROUND_HALF_DOWN)
-					.equals(unidentifiedPayment.getPayAmt().setScale(precision, BigDecimal.ROUND_HALF_DOWN))) {
+			if(!identifiedPayment.getPayAmt().setScale(precision, RoundingMode.HALF_DOWN)
+					.equals(unidentifiedPayment.getPayAmt().setScale(precision, RoundingMode.HALF_DOWN))) {
 				throw new AdempiereException("@PayAmt@ @Mismatched@");
 			}
 			//	Document Status

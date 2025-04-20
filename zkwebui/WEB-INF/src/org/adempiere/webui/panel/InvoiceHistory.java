@@ -34,7 +34,6 @@ import org.adempiere.webui.component.Tabpanels;
 import org.adempiere.webui.component.Tabs;
 import org.adempiere.webui.component.WListbox;
 import org.adempiere.webui.component.Window;
-import org.compiere.model.MDocType;
 import org.compiere.model.MPriceList;
 import org.compiere.util.CLogMgt;
 import org.compiere.util.CLogger;
@@ -356,7 +355,7 @@ public class InvoiceHistory extends Window implements EventListener
 				//	0-Name, 1-PriceActual, 2-QtyInvoiced, 3-Discount, 4-DocumentNo, 5-DateInvoiced
 				line.add(rs.getString(1));      //  Name
 				line.add(rs.getBigDecimal(2));  //	Price
-				line.add(new Double(rs.getDouble(4)));      //  Qty
+				line.add(Double.valueOf(rs.getDouble(4)));      //  Qty
 				BigDecimal discountBD = rs.getBigDecimal(8);
 				if (discountBD == null) {
 					double priceList = rs.getDouble(3);
@@ -645,9 +644,9 @@ public class InvoiceHistory extends Window implements EventListener
 				Vector<Object> line = new Vector<Object>(6);
 				//	1-Name, 2-MovementQty, 3-MovementDate, 4-IsSOTrx, 5-DocumentNo
 				line.add(rs.getString(1));      		//  Name
-				line.add(new Double(rs.getDouble(2)));  //  Qty
+				line.add(Double.valueOf(rs.getDouble(2)));  //  Qty
 				line.add(rs.getTimestamp(3));   		//  Date
-				line.add(new Boolean("Y".equals(rs.getString(4))));	//  IsSOTrx
+				line.add(Boolean.valueOf("Y".equals(rs.getString(4))));	//  IsSOTrx
 				line.add(rs.getString(5));				//  DocNo
 				line.add(rs.getString(6));				//  Warehouse
 				data.add(line);

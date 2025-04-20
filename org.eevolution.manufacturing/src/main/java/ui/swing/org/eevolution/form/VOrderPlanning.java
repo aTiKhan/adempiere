@@ -66,7 +66,7 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Msg;
-import org.eevolution.model.MPPOrder;
+import org.eevolution.manufacturing.model.MPPOrder;
 /**
  *
  * @author  vpj-cd
@@ -74,6 +74,8 @@ import org.eevolution.model.MPPOrder;
 public class VOrderPlanning extends CPanel
 implements FormPanel, ActionListener, VetoableChangeListener, ChangeListener, ListSelectionListener, TableModelListener, ASyncProcess
 {
+	private static final long serialVersionUID = -2027009461523708974L;
+
 	/** Creates new form VOrderPlanning */
 	public VOrderPlanning()
 	{
@@ -644,15 +646,15 @@ implements FormPanel, ActionListener, VetoableChangeListener, ChangeListener, Li
 							p_table.setColumnReadOnly(0, false);
 						}        
 						else if (c == Boolean.class)
-							data = new Boolean("Y".equals(rs.getString(colIndex)));
+							data = Boolean.valueOf("Y".equals(rs.getString(colIndex)));
 						else if (c == Timestamp.class)
 							data = rs.getTimestamp(colIndex);
 						else if (c == BigDecimal.class)
 							data = rs.getBigDecimal(colIndex);
 						else if (c == Double.class)
-							data = new Double(rs.getDouble(colIndex));
+							data = Double.valueOf(rs.getDouble(colIndex));
 						else if (c == Integer.class)
-							data = new Integer(rs.getInt(colIndex));
+							data = Integer.valueOf(rs.getInt(colIndex));
 						else if (c == KeyNamePair.class)
 						{
 							String display = rs.getString(colIndex);

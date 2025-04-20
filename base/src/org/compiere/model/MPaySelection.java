@@ -25,6 +25,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.I_C_PaySelection;
+import org.adempiere.core.domains.models.I_C_PaySelectionLine;
+import org.adempiere.core.domains.models.X_C_PaySelection;
+import org.adempiere.core.domains.models.X_C_Payment;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.process.DocAction;
 import org.compiere.process.DocOptions;
@@ -681,7 +685,7 @@ public class MPaySelection extends X_C_PaySelection implements DocAction, DocOpt
 				+ "(CASE "
 				+ "		WHEN COALESCE("
 				+ "					SUM(CASE "
-				+ "							WHEN p.DocStatus NOT IN('VO', 'RE') "
+				+ "							WHEN p.DocStatus IN('CO', 'CL') "
 				+ "							THEN 1 "
 				+ "							ELSE 0 "
 				+ "							END"

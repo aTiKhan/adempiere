@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.compiere.model.I_C_OrderLine;
+import org.adempiere.core.domains.models.I_C_OrderLine;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MClientInfo;
@@ -47,6 +47,9 @@ import org.compiere.util.Env;
  *  </pre>
  *  @author Jorg Janke
  *  @version  $Id: Doc_Order.java,v 1.3 2006/07/30 00:53:33 jjanke Exp $
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class Doc_Order extends Doc
 {
@@ -162,7 +165,7 @@ public class Doc_Order extends Doc
 		for (int i = 0; i < oLines.length; i++)
 		{
 			MOrderLine line = oLines[i];
-			qtys.put(new Integer(line.getC_OrderLine_ID()), line.getQtyOrdered());
+			qtys.put(Integer.valueOf(line.getC_OrderLine_ID()), line.getQtyOrdered());
 		}
 		//
 		ArrayList<DocLine> list = new ArrayList<DocLine>();
@@ -185,7 +188,7 @@ public class Doc_Order extends Doc
 				DocLine docLine = new DocLine (line, this);
 				//	Quantity - not more then OrderLine
 				//	Issue: Split of Requisition to multiple POs & different price
-				Integer key = new Integer(line.getC_OrderLine_ID());
+				Integer key = Integer.valueOf(line.getC_OrderLine_ID());
 				BigDecimal maxQty = qtys.get(key);
 				BigDecimal Qty = line.getQty().max(maxQty);
 				if (Qty.signum() == 0)

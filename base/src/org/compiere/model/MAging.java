@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.X_T_Aging;
 import org.compiere.util.Env;
 
 /**
@@ -116,9 +117,9 @@ public class MAging extends X_T_Aging
 
 		//	Optional
 	//	setC_Invoice_ID (C_Invoice_ID);		// may be zero
-		set_ValueNoCheck ("C_Invoice_ID", new Integer(C_Invoice_ID));
+		set_ValueNoCheck("C_Invoice_ID", Integer.valueOf(C_Invoice_ID));
 	//	setC_InvoicePaySchedule_ID(C_InvoicePaySchedule_ID);	//	may be zero
-		set_Value ("C_InvoicePaySchedule_ID", new Integer(C_InvoicePaySchedule_ID));
+		set_Value("C_InvoicePaySchedule_ID", Integer.valueOf(C_InvoicePaySchedule_ID));
 		setIsListInvoices(C_Invoice_ID != 0);
 		//
 		setDueDate(DueDate);		//	only sensible if List invoices
@@ -185,9 +186,9 @@ public class MAging extends X_T_Aging
 
 		//	Optional
 	//	setC_Invoice_ID (C_Invoice_ID);		// may be zero
-		set_ValueNoCheck ("C_Invoice_ID", new Integer(C_Invoice_ID));
+		set_ValueNoCheck("C_Invoice_ID", Integer.valueOf(C_Invoice_ID));
 	//	setC_InvoicePaySchedule_ID(C_InvoicePaySchedule_ID);	//	may be zero
-		set_Value ("C_InvoicePaySchedule_ID", new Integer(C_InvoicePaySchedule_ID));
+		set_Value("C_InvoicePaySchedule_ID", Integer.valueOf(C_InvoicePaySchedule_ID));
 		setIsListInvoices(C_Invoice_ID != 0);
 		//
 		setDueDate(DueDate);		//	only sensible if List invoices

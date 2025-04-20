@@ -65,6 +65,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
+import static io.vavr.API.Option;
+
 
 /**
  *  General Database Interface
@@ -731,21 +733,6 @@ public final class DB
 	}	//	prepareCall
 
 
-	/**************************************************************************
-	 *	Prepare Statement
-	 *  @param sql
-	 *  @return Prepared Statement
-	 *  @deprecated
-	 */
-	public static CPreparedStatement prepareStatement (String sql)
-	{
-		int concurrency = ResultSet.CONCUR_READ_ONLY;
-		String upper = sql.toUpperCase();
-		if (upper.startsWith("UPDATE ") || upper.startsWith("DELETE "))
-			concurrency = ResultSet.CONCUR_UPDATABLE;
-		return prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, concurrency, null);
-	}	//	prepareStatement
-
 	/**
 	 *	Prepare Statement
 	 *  @param sql
@@ -759,20 +746,6 @@ public final class DB
 		if (upper.startsWith("UPDATE ") || upper.startsWith("DELETE "))
 			concurrency = ResultSet.CONCUR_UPDATABLE;
 		return prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, concurrency, trxName);
-	}	//	prepareStatement
-
-	/**
-	 *	Prepare Statement.
-	 *  @param sql sql statement
-	 *  @param resultSetType - ResultSet.TYPE_FORWARD_ONLY, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.TYPE_SCROLL_SENSITIVE
-	 *  @param resultSetConcurrency - ResultSet.CONCUR_READ_ONLY or ResultSet.CONCUR_UPDATABLE
-	 *  @return Prepared Statement r/o or r/w depending on concur
-	 *  @deprecated
-	 */
-	public static CPreparedStatement prepareStatement (String sql,
-		int resultSetType, int resultSetConcurrency)
-	{
-		return prepareStatement(sql, resultSetType, resultSetConcurrency, null);
 	}	//	prepareStatement
 
 	/**
@@ -978,7 +951,7 @@ public final class DB
 	 */
 	public static int executeUpdate (String sql, int param, String trxName, int timeOut)
 	{
-		return executeUpdate (sql, new Object[]{new Integer(param)}, false, trxName, timeOut);
+		return executeUpdate (sql, new Object[]{Integer.valueOf(param)}, false, trxName, timeOut);
 	}	//	executeUpdate
 
 	/**
@@ -1007,7 +980,7 @@ public final class DB
 	 */
 	public static int executeUpdate (String sql, int param, boolean ignoreError, String trxName, int timeOut)
 	{
-		return executeUpdate (sql, new Object[]{new Integer(param)}, ignoreError, trxName, timeOut);
+		return executeUpdate (sql, new Object[]{Integer.valueOf(param)}, ignoreError, trxName, timeOut);
 	}	//	executeUpdate
 
 	/**
@@ -2601,15 +2574,17 @@ public final class DB
 
 	/**
 	 * Execute ResultSet from a function
-	 * Parameters Type <String sql , List<Object> parameters , String trxName , ResultSetRunnable<ResultSet> callback>
+	 * Parameters Type <String trxName . String sql , io.vavr.collection.List<Object> parameters , ResultSetRunnable<ResultSet> callback>
 	 * Use apply method to set of parameters
 	 */
-	static Function4<String , String, List<Object>, ResultSetRunnable<ResultSet>, Try<Void>> runResultSetFunction = (trxName , sql, parameters, callback) -> {
+	public static Function4<String , String,  io.vavr.collection.List<Object>, ResultSetRunnable<ResultSet>, Try<Void>> runResultSetFunction = (trxName , sql, parameters, callback) -> {
 		AtomicReference<CPreparedStatement> preparedStatementReference = new AtomicReference<>();
 		AtomicReference<ResultSet> resultSetReference = new AtomicReference<>();
 		return Try.run(() -> {
-			CPreparedStatement prepareStatement = prepareStatement(sql, trxName);
-			DB.setParameters(prepareStatement, parameters);
+			final CPreparedStatement prepareStatement = prepareStatement(sql, trxName);
+			if (Option(parameters).isDefined()) {
+				DB.setParameters(prepareStatement, parameters.asJava());
+			}
 			preparedStatementReference.set(prepareStatement);
 			ResultSet resultSet = preparedStatementReference.get().executeQuery();
 			callback.run(resultSet);
@@ -2618,4 +2593,16 @@ public final class DB
 			DB.close(resultSetReference.get(), preparedStatementReference.get());
 		});
 	};
+
+	/**
+	 * Execute ResultSet from an imperative Mode
+	 * @param trxName trx Name
+	 * @param sql SQL
+	 * @param parameters Parameters
+	 * @param resultSet ResultSet
+	 * @return
+	 */
+	public static Try<Void> runResultSet(String trxName , String sql , java.util.List<Object> parameters , ResultSetRunnable<ResultSet> resultSet) {
+		return runResultSetFunction.apply(trxName , sql ,  io.vavr.collection.List.ofAll(parameters) , resultSet);
+	}
 }	//	DB

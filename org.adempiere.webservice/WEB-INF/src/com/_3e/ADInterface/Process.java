@@ -330,7 +330,7 @@ public class Process {
 	private static MPInstance fillParameter(CompiereService compiereService, DataRow dataRow, MProcess process) throws Exception {
 		MPInstance instance = new MPInstance(process, 0);
 		DataField dataFields[] = dataRow.getFieldArray();
-		HashMap hashMap = new HashMap();
+		HashMap<String, Object> hashMap = new HashMap<String, Object>();
 		for (int i = 0; i < dataFields.length; i++)
 			hashMap.put(dataFields[i].getColumn(), dataFields[i].getVal());
 		//
@@ -510,7 +510,7 @@ public class Process {
 				+ " AND l.AD_Reference_ID=135 ORDER BY t.Name";
 		try
 		{
-			PreparedStatement pstmt = DB.prepareStatement(sql);
+			PreparedStatement pstmt = DB.prepareStatement(sql, null);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next())
 			{

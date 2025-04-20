@@ -43,12 +43,12 @@ import org.compiere.model.MDocType;
 import org.compiere.model.MFactAcct;
 import org.compiere.model.MNote;
 import org.compiere.model.MPeriod;
+import org.compiere.model.MTable;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
 import org.compiere.model.Query;
 import org.compiere.process.DocumentEngine;
-import org.compiere.util.AdempiereUserError;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -210,6 +210,18 @@ public abstract class Doc
 	/**	Document Status         */
 	public static final String 	STATUS_Error            = "E";
 
+	/**
+	 *  Create Posting document
+	 *	@param ass accounting schema
+	 *  @param tableName Table Name of Documents
+	 *  @param Record_ID record ID to load
+	 *  @param trxName transaction name
+	 *  @return Document or null
+	 */
+	public static Doc get (MAcctSchema[] ass, String tableName, int Record_ID, String trxName)  {
+		return get(ass, MTable.getTable_ID(tableName), Record_ID, trxName);
+	}	//	get
+	
 	
 	/**
 	 *  Create Posting document
@@ -221,18 +233,26 @@ public abstract class Doc
 	 */
 	public static Doc get (MAcctSchema[] ass, int AD_Table_ID, int Record_ID, String trxName) 
 	{
-		try {
-			return new DocFactory()
-					.withAccountingSchemes(ass)
-					.withTableID(AD_Table_ID)
-					.withRecordID(Record_ID)
-					.withTrxName(trxName)
-					.get();
-		} catch (AdempiereUserError e) {
-			s_log.log (Level.SEVERE, e.getMessage(), e);
-			return null;
-		}
+		return new DocFactory()
+				.withAccountingSchemes(ass)
+				.withTableID(AD_Table_ID)
+				.withRecordID(Record_ID)
+				.withTrxName(trxName)
+				.get();
 	}	//	get
+	
+	/**
+	 *  Create Posting document
+	 *	@param ass accounting schema
+	 *  @param String Table Name of Documents
+	 *  @param rs ResultSet
+	 *  @param trxName transaction name
+	 *  @return Document
+	 * @throws AdempiereUserError 
+	 */
+	public static Doc get(MAcctSchema[] ass, String tableName, ResultSet rs, String trxName) {
+		return get(ass, MTable.getTable_ID(tableName), rs, trxName);
+	}   //  get
 	
 	/**
 	 *  Create Posting document
@@ -243,7 +263,7 @@ public abstract class Doc
 	 *  @return Document
 	 * @throws AdempiereUserError 
 	 */
-	public static Doc get (MAcctSchema[] ass, int AD_Table_ID, ResultSet rs, String trxName) throws AdempiereUserError
+	public static Doc get (MAcctSchema[] ass, int AD_Table_ID, ResultSet rs, String trxName)
 	{
 		
 		return new DocFactory()
@@ -393,7 +413,7 @@ public abstract class Doc
 	 * 	@param defaultDocumentType default document type or null
 	 * 	@param trxName trx
 	 */
-	Doc (MAcctSchema[] ass, Class<?> clazz, ResultSet rs, String defaultDocumentType, String trxName)
+	public Doc (MAcctSchema[] ass, Class<?> clazz, ResultSet rs, String defaultDocumentType, String trxName)
 	{
 		p_Status = STATUS_Error;
 		accountingSchemes = ass;
@@ -491,7 +511,7 @@ public abstract class Doc
 	private ArrayList<Fact>    	m_fact = null;
 
 	/** No Currency in Document Indicator (-1)	*/
-	protected static final int  NO_CURRENCY = -2;
+	public static final int  NO_CURRENCY = -2;
 	
 	/**	Actual Document Status  */
 	protected String			p_Status = null;
@@ -501,8 +521,7 @@ public abstract class Doc
 
 	/** Error Message			*/
 	protected String			p_Error = null;
-	
-	
+
 	/**
 	 * 	Get Context
 	 *	@return context
@@ -543,7 +562,7 @@ public abstract class Doc
 	 * 	Get Persistent Object
 	 *	@return po
 	 */
-	protected PO getPO()
+	public PO getPO()
 	{
 		return p_po;
 	}	//	getPO
@@ -1101,12 +1120,12 @@ public abstract class Doc
 		}
 		//  Get All Currencies
 		HashSet<Integer> set = new HashSet<Integer>();
-		set.add(new Integer(getC_Currency_ID()));
+		set.add(Integer.valueOf(getC_Currency_ID()));
 		for (int i = 0; p_lines != null && i < p_lines.length; i++)
 		{
 			int C_Currency_ID = p_lines[i].getC_Currency_ID();
 			if (C_Currency_ID != NO_CURRENCY)
-				set.add(new Integer(C_Currency_ID));
+				set.add(Integer.valueOf(C_Currency_ID));
 		}
 
 		//  just one and the same
@@ -1159,7 +1178,7 @@ public abstract class Doc
 				m_period = MPeriod.get(getCtx(), ii.intValue());
 		}
 		if (m_period == null)
-			m_period = MPeriod.get(getCtx(), getDateAcct(), getAD_Org_ID());
+			m_period = MPeriod.get(getCtx(), getDateAcct(), getAD_Org_ID(), null);
 		//	Is Period Open?
 		if (m_period != null 
 			&& m_period.isOpen(getDocumentType(), getDateAcct()))
@@ -2669,5 +2688,36 @@ public abstract class Doc
         return dateAcctColumnName;
 
     }
+    
+    public void setDocumentLines(List<DocLine> documentLines) {
+    	if(documentLines == null) {
+    		p_lines = null;
+    	}
+    	p_lines = documentLines.toArray(DocLine[]::new);
+    }
+    
+    /**
+     * Set source entity or document
+     * @param entity
+     */
+    public void setSourceEntity(PO entity) {
+    	p_po = entity;
+    }
+    
+	public String getDocumentStatus() {
+		return p_Status;
+	}
+
+	public void setDocumentStatus(String p_Status) {
+		this.p_Status = p_Status;
+	}
+
+	public String getError() {
+		return p_Error;
+	}
+
+	public void setError(String error) {
+		this.p_Error = error;
+	}
 
 }   //  Doc

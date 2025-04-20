@@ -24,6 +24,12 @@
     <fileset dir="../lib">
       <include name="*.jar"/>
     </fileset>
+  	<fileset dir="../org.eevolution.distribution/dist/lib">
+  	  <include name="*.jar"/>
+  	</fileset>
+  	<fileset dir="../org.eevolution.manufacturing/dist/lib">
+  	  <include name="*.jar"/>
+  	</fileset>
     <pathelement path="../tools/lib/c3p0-0.9.1.2.jar"/>
     <pathelement path="../serverApps/src/web/WEB-INF/lib/commons-lang-2.1.jar"/>
   </path>
@@ -93,10 +99,12 @@
         <attribute name="Implementation-Version" value="${env.ADEMPIERE_VERSION} ${DSTAMP}-${TSTAMP}"/>
         <attribute name="Implementation-Vendor" value="${env.ADEMPIERE_VENDOR}"/> 
         <attribute name="Implementation-URL" value="http://www.adempiere.net"/>
-        <attribute name="Main-Class" value="org.compiere.Adempiere"/>
+        <attribute name="Main-Class" value="org.adempiere.Adempiere"/>
         <attribute name="Class-Path" value="ProductionLight.jar"/>
       </manifest> 
     </jar>
+  	<copy file="../tools/lib/legacy/production-support-legacy-1.0.0.jar" todir="${env.ADEMPIERE_HOME}/packages/ProductionLight/lib" />
+  	<copy file="../tools/lib/legacy/production-support-legacy-1.0.0.jar" todir="../packages/" />
   </target>
 
 

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.core.domains.models.I_C_Period;
+import org.adempiere.core.domains.models.X_C_Period;
 import org.adempiere.exceptions.PeriodClosedException;
 import org.compiere.util.CCache;
 import org.compiere.util.CLogger;
@@ -67,7 +69,7 @@ public class MPeriod extends X_C_Period
 		if (C_Period_ID <= 0)
 			return null;
 		//
-		Integer key = new Integer(C_Period_ID);
+		Integer key = Integer.valueOf(C_Period_ID);
 		MPeriod retValue = (MPeriod) s_cache.get (key);
 		if (retValue != null)
 			return retValue;
@@ -177,7 +179,7 @@ public class MPeriod extends X_C_Period
 			while (rs.next())
 			{
 				MPeriod period = new MPeriod(ctx, rs, trxName);
-				Integer key = new Integer(period.getC_Period_ID());
+				Integer key = Integer.valueOf(period.getC_Period_ID());
 				s_cache.put (key, period);
 				if (period.isStandardPeriod())
 					retValue = period;
@@ -827,8 +829,8 @@ public class MPeriod extends X_C_Period
         
         if (calendarId == 0)
         {
-            MClientInfo cInfo = MClientInfo.get(ctx, clientId);
-            calendarId = cInfo.getC_Calendar_ID();
+            MClientInfo clientInfo = MClientInfo.get(ctx, clientId, trxName);
+            calendarId = clientInfo.getC_Calendar_ID();
         }
         
       return calendarId;

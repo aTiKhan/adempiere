@@ -32,6 +32,10 @@ import java.util.logging.Level;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
+import org.adempiere.core.domains.models.I_AD_User;
+import org.adempiere.core.domains.models.X_AD_User;
+import org.adempiere.core.domains.models.X_AD_UserBPAccess;
+import org.adempiere.core.domains.models.X_C_BPartner;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.util.CCache;
 import org.compiere.util.CLogger;
@@ -135,7 +139,7 @@ public class MUser extends X_AD_User
 	 */
 	public static MUser get (Properties ctx, int AD_User_ID)
 	{
-		Integer key = new Integer(AD_User_ID);
+		Integer key = Integer.valueOf(AD_User_ID);
 		MUser retValue = (MUser)s_cache.get(key);
 		if (retValue == null)
 		{

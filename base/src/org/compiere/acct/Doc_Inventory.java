@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-import org.compiere.model.I_M_Inventory;
+import org.adempiere.core.domains.models.I_M_Inventory;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MCostDetail;
@@ -28,7 +28,6 @@ import org.compiere.model.MInventory;
 import org.compiere.model.MInventoryLine;
 import org.compiere.model.ProductCost;
 import org.compiere.util.Env;
-import org.eevolution.model.I_DD_Order;
 
 /**
  *  Post Inventory Documents.

@@ -21,8 +21,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
-import org.compiere.model.I_M_Movement;
-import org.compiere.model.I_M_Requisition;
+import org.adempiere.core.domains.models.I_M_Requisition;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MRequisition;
@@ -89,8 +88,8 @@ public class Doc_Requisition extends Doc
 			BigDecimal Qty = line.getQty();
 			docLine.setQty (Qty, false);
 			BigDecimal PriceActual = line.getPriceActual();
-			BigDecimal LineNetAmt = line.getLineNetAmt();
-			docLine.setAmount (LineNetAmt);	 // DR
+			BigDecimal lineTotalAmt = line.getLineTotalAmt();
+			docLine.setAmount (lineTotalAmt);	 // DR
 			list.add (docLine);
 		}
 		// Return Array

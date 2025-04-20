@@ -32,15 +32,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.ecs.xhtml.a;
-import org.apache.ecs.xhtml.div;
-import org.apache.ecs.xhtml.fieldset;
-import org.apache.ecs.xhtml.form;
-import org.apache.ecs.xhtml.h1;
-import org.apache.ecs.xhtml.h2;
-import org.apache.ecs.xhtml.img;
-import org.apache.ecs.xhtml.li;
-import org.apache.ecs.xhtml.ul;
+import org.adempiere.legacy.apache.ecs.xhtml.a;
+import org.adempiere.legacy.apache.ecs.xhtml.div;
+import org.adempiere.legacy.apache.ecs.xhtml.fieldset;
+import org.adempiere.legacy.apache.ecs.xhtml.form;
+import org.adempiere.legacy.apache.ecs.xhtml.h1;
+import org.adempiere.legacy.apache.ecs.xhtml.h2;
+import org.adempiere.legacy.apache.ecs.xhtml.img;
+import org.adempiere.legacy.apache.ecs.xhtml.li;
+import org.adempiere.legacy.apache.ecs.xhtml.ul;
 // todo: chart support import org.compiere.grid.ed.ChartBuilder;
 import org.compiere.model.GridField;
 import org.compiere.model.GridFieldVO;
@@ -819,7 +819,7 @@ public class WWindow extends HttpServlet
 			Integer ii = null;
 			try
 			{
-				ii = new Integer (value);
+				ii = Integer.valueOf(value);
 			}
 			catch (Exception e)
 			{

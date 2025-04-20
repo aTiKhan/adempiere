@@ -36,6 +36,7 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.adempiere.core.domains.models.X_AD_Table;
 import org.compiere.util.CLogMgt;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -59,6 +60,8 @@ import org.spin.util.ASPUtil;
  *  Usually editors listen to their fields.
  *
  *  @author Jorg Janke
+ *  @version $Id: GridField.java,v 1.5 2006/07/30 00:51:02 jjanke Exp $
+ * 
  *  @author Victor Perez , e-Evolution.SC FR [ 1757088 ], [1877902] Implement JSR 223 Scripting APIs to Callout
  *  		http://sourceforge.net/tracker/?func=detail&atid=879335&aid=1877902&group_id=176962 to FR [1877902]
  *    <li>Implement embedded or horizontal tab panel https://adempiere.atlassian.net/browse/ADEMPIERE-319
@@ -83,7 +86,10 @@ import org.spin.util.ASPUtil;
  * 		@see https://github.com/adempiere/adempiere/issues/349
  * 		<a href="https://github.com/adempiere/adempiere/issues/566">
  * 		@see FR [ 566 ] Process parameter don't have a parameter like only information</a>
- *  @version $Id: GridField.java,v 1.5 2006/07/30 00:51:02 jjanke Exp $
+ *
+ *	@author Edwin Betancourt, EdwinBetanc0urt@outlook.com, https://github.com/EdwinBetanc0urt
+ * 		@see <a href="https://github.com/adempiere/adempiere/issues/3576">
+ * 		BR [ 3576 ] Currency Rate does not allow editing the Currency To value.</a>
  */
 public class GridField 
 	implements Serializable, Evaluatee
@@ -617,14 +623,14 @@ public class GridField
 			&& (m_vo.ColumnName.equals("AD_Client_ID") || m_vo.ColumnName.equals("AD_Org_ID")))
 		{
 			log.fine("[SystemAccess] " + m_vo.ColumnName + "=0");
-			return new Integer(0);
+			return Integer.valueOf(0);
 		}
 		//	Set Org to System, if Client access
 		else if (X_AD_Table.ACCESSLEVEL_SystemPlusClient.equals(Env.getContext(m_vo.ctx, m_vo.WindowNo, m_vo.TabNo, GridTab.CTX_AccessLevel))
 			&& m_vo.ColumnName.equals("AD_Org_ID"))
 		{
 			log.fine("[ClientAccess] " + m_vo.ColumnName + "=0");
-			return new Integer(0);
+			return Integer.valueOf(0);
 		}
 
 		/**
@@ -779,24 +785,27 @@ public class GridField
 		{
 			//	IDs & Integer & CreatedBy/UpdatedBy
 			if (m_vo.ColumnName.endsWith("atedBy")
-					|| (m_vo.ColumnName.endsWith("_ID") && DisplayType.isID(m_vo.displayType))) // teo_sarca [ 1672725 ] Process parameter that ends with _ID but is boolean
+				|| ((m_vo.ColumnName.endsWith("_ID") || m_vo.ColumnName.endsWith("_ID_To")
+				|| m_vo.ColumnName.equals("AD_Key") || m_vo.ColumnName.equals("AD_Display")
+				|| m_vo.ColumnName.endsWith("_Acct"))
+				&& DisplayType.isID(m_vo.displayType))) // teo_sarca [ 1672725 ] Process parameter that ends with _ID but is boolean
 			{
 				try	//	defaults -1 => null
 				{
 					int ii = Integer.parseInt(value);
 					if (ii < 0)
 						return null;
-					return new Integer(ii);
+					return Integer.valueOf(ii);
 				}
 				catch (Exception e)
 				{
 					log.warning("Cannot parse: " + value + " - " + e.getMessage());
 				}
-				return new Integer(0);
+				return Integer.valueOf(0);
 			}
 			//	Integer
 			if (m_vo.displayType == DisplayType.Integer)
-				return new Integer(value);
+				return Integer.valueOf(value);
 			
 			//	Number
 			if (DisplayType.isNumeric(m_vo.displayType))
@@ -1579,10 +1588,14 @@ public class GridField
 		{
 			//	Return Integer
 			if (dt == DisplayType.Integer
-				|| (DisplayType.isID(dt) && getColumnName().endsWith("_ID")))
-			{
+				|| (DisplayType.isID(dt)
+				&& (getColumnName().endsWith("_ID") || getColumnName().endsWith("_ID_To")
+				|| getColumnName().equals("AD_Key") || getColumnName().equals("AD_Display")
+				|| getColumnName().endsWith("_Acct")))
+				|| getColumnName().endsWith("atedBy")
+			) {
 				int i = Integer.parseInt(newValue);
-				setValue (new Integer(i), inserting);
+				setValue(Integer.valueOf(i), inserting);
 			}
 			//	Return BigDecimal
 			else if (DisplayType.isNumeric(dt))

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -48,6 +49,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.adempiere.core.domains.models.I_AD_Element;
+import org.adempiere.core.domains.models.I_AD_Session;
+import org.adempiere.core.domains.models.X_C_ElementValue;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.adempiere.model.GenericPO;
@@ -113,6 +117,9 @@ import org.w3c.dom.Element;
  * @author Carlos Parada, cparada@erpya.com, ERPCyA http://www.erpya.com
  *  		<a href="https://github.com/adempiere/adempiere/issues/729">
  *			@see FR [ 729 ] Add Support to Parent Column And Search Column for Tree </a>
+ * @author Edwin Betancourt, EdwinBetanc0urt@outlook.com, https://github.com/EdwinBetanc0urt
+ *			<a href="https://github.com/adempiere/adempiere/issues/4000">
+ *			@see BR [ 4000 ] Allows deletion of System client records with the GardenWorld client</a>
  */
 public abstract class PO
 	implements Serializable, Comparator, Evaluatee, Cloneable
@@ -281,7 +288,7 @@ public abstract class PO
 	private HashMap<String,String>	m_custom = null;
 
 	/** Zero Integer				*/
-	protected static final Integer I_ZERO = new Integer(0);
+	protected static final Integer I_ZERO = Integer.valueOf(0);
 	/** Accounting Columns			*/
 	private ArrayList <String>	s_acctColumns = null;
 
@@ -696,7 +703,7 @@ public abstract class PO
 		{
 			int result = ((Integer)nValue).intValue();
 			result -= ((Integer)oValue).intValue();
-			return new Integer(result);
+			return Integer.valueOf(result);
 		}
 		//
 		log.warning("Invalid type - New=" + nValue);
@@ -817,11 +824,11 @@ public abstract class PO
 			//  Integer can be set as BigDecimal
 			else if (value.getClass() == BigDecimal.class
 				&& p_info.getColumnClass(index) == Integer.class)
-				m_newValues[index] = new Integer (((BigDecimal)value).intValue());
+				m_newValues[index] = Integer.valueOf(((BigDecimal)value).intValue());
 			//	Set Boolean
 			else if (p_info.getColumnClass(index) == Boolean.class
 				&& ("Y".equals(value) || "N".equals(value)) )
-				m_newValues[index] = new Boolean("Y".equals(value));
+				m_newValues[index] = Boolean.valueOf("Y".equals(value));
 			// added by vpj-cd
 			// To solve BUG [ 1618423 ] Set Project Type button in Project window throws warning
 			// generated because C_Project.C_Project_Type_ID is defined as button in dictionary
@@ -833,7 +840,7 @@ public abstract class PO
 					&& p_info.getColumnClass(index) == Integer.class)
 				try
 				{
-					m_newValues[index] = new Integer((String)value);
+					m_newValues[index] = Integer.valueOf((String)value);
 				}
 				catch (NumberFormatException e)
 				{
@@ -943,11 +950,11 @@ public abstract class PO
 			//  Integer can be set as BigDecimal
 			else if (value.getClass() == BigDecimal.class
 				&& p_info.getColumnClass(index) == Integer.class)
-				m_newValues[index] = new Integer (((BigDecimal)value).intValue());
+				m_newValues[index] = Integer.valueOf(((BigDecimal) value).intValue());
 			//	Set Boolean
 			else if (p_info.getColumnClass(index) == Boolean.class
 				&& ("Y".equals(value) || "N".equals(value)) )
-				m_newValues[index] = new Boolean("Y".equals(value));
+				m_newValues[index] = Boolean.valueOf("Y".equals(value));
 			else if (p_info.getColumnClass(index) == Integer.class
 				&& value.getClass() == String.class)
 			{
@@ -1401,7 +1408,7 @@ public abstract class PO
 		{
 			setKeyInfo();
 			//m_KeyColumns = new String[] {p_info.getTableName() + "_ID"};
-			m_IDs = new Object[] {new Integer(ID)};
+			m_IDs = new Object[] {Integer.valueOf(ID)};
 			load(trxName);
 		}
 		else	//	new
@@ -1509,11 +1516,11 @@ public abstract class PO
 			try
 			{
 				if (clazz == Integer.class)
-					m_oldValues[index] = decrypt(index, new Integer(rs.getInt(columnName)));
+					m_oldValues[index] = decrypt(index, Integer.valueOf(rs.getInt(columnName)));
 				else if (clazz == BigDecimal.class)
 					m_oldValues[index] = decrypt(index, rs.getBigDecimal(columnName));
 				else if (clazz == Boolean.class)
-					m_oldValues[index] = new Boolean ("Y".equals(decrypt(index, rs.getString(columnName))));
+					m_oldValues[index] = Boolean.valueOf("Y".equals(decrypt(index, rs.getString(columnName))));
 				else if (clazz == Timestamp.class)
 					m_oldValues[index] = decrypt(index, rs.getTimestamp(columnName));
 				else if (DisplayType.isLOB(dt) || (DisplayType.isText(dt) && p_info.getFieldLength(index) > 4000))
@@ -1573,11 +1580,11 @@ public abstract class PO
 			try
 			{
 				if (clazz == Integer.class)
-					m_oldValues[index] = new Integer(value);
+					m_oldValues[index] = Integer.valueOf(value);
 				else if (clazz == BigDecimal.class)
 					m_oldValues[index] = new BigDecimal(value);
 				else if (clazz == Boolean.class)
-					m_oldValues[index] = new Boolean ("Y".equals(value));
+					m_oldValues[index] = Boolean.valueOf("Y".equals(value));
 				else if (clazz == Timestamp.class)
 					m_oldValues[index] = Timestamp.valueOf(value);
 				else if (DisplayType.isLOB(dt))
@@ -1725,23 +1732,23 @@ public abstract class PO
 			String colName = p_info.getColumnName(i);
 			//  Set Standard Values
 			if (colName.endsWith("tedBy"))
-				m_newValues[i] = new Integer (Env.getContextAsInt(p_ctx, "#AD_User_ID"));
+				m_newValues[i] = Integer.valueOf(Env.getContextAsInt(p_ctx, "#AD_User_ID"));
 			else if (colName.equals("Created") || colName.equals("Updated"))
 				m_newValues[i] = new Timestamp (System.currentTimeMillis());
 			else if (colName.equals(p_info.getTableName() + "_ID"))    //  KeyColumn
 				m_newValues[i] = I_ZERO;
 			else if (colName.equals("IsActive"))
-				m_newValues[i] = new Boolean(true);
+				m_newValues[i] = Boolean.TRUE;
 			else if (colName.equals("AD_Client_ID"))
-				m_newValues[i] = new Integer(Env.getAD_Client_ID(p_ctx));
+				m_newValues[i] = Integer.valueOf(Env.getAD_Client_ID(p_ctx));
 			else if (colName.equals("AD_Org_ID"))
-				m_newValues[i] = new Integer(Env.getAD_Org_ID(p_ctx));
+				m_newValues[i] = Integer.valueOf(Env.getAD_Org_ID(p_ctx));
 			else if (colName.equals("Processed"))
-				m_newValues[i] = new Boolean(false);
+				m_newValues[i] = Boolean.FALSE;
 			else if (colName.equals("Processing"))
-				m_newValues[i] = new Boolean(false);
+				m_newValues[i] = Boolean.FALSE;
 			else if (colName.equals("Posted"))
-				m_newValues[i] = new Boolean(false);
+				m_newValues[i] = Boolean.FALSE;
 			else
 				m_newValues[i] = getDefaultValue(get_ColumnName(i));
 		}
@@ -1884,7 +1891,7 @@ public abstract class PO
 	 */
 	final protected void setAD_Client_ID (int AD_Client_ID)
 	{
-		set_ValueNoCheck ("AD_Client_ID", new Integer(AD_Client_ID));
+		set_ValueNoCheck("AD_Client_ID", Integer.valueOf(AD_Client_ID));
 	}	//	setAD_Client_ID
 
 	/**
@@ -1905,7 +1912,7 @@ public abstract class PO
 	 */
 	final public void setAD_Org_ID (int AD_Org_ID)
 	{
-		set_ValueNoCheck ("AD_Org_ID", new Integer(AD_Org_ID));
+		set_ValueNoCheck("AD_Org_ID", Integer.valueOf(AD_Org_ID));
 	}	//	setAD_Org_ID
 
 	/**
@@ -1948,7 +1955,7 @@ public abstract class PO
 	 */
 	public final void setIsActive (boolean active)
 	{
-		set_Value("IsActive", new Boolean(active));
+		set_Value("IsActive", Boolean.valueOf(active));
 	}	//	setActive
 
 	/**
@@ -2011,7 +2018,7 @@ public abstract class PO
 	 */
 	final protected void setUpdatedBy (int AD_User_ID)
 	{
-		set_ValueNoCheck ("UpdatedBy", new Integer(AD_User_ID));
+		set_ValueNoCheck("UpdatedBy", Integer.valueOf(AD_User_ID));
 	}	//	setAD_User_ID
 
 	/**
@@ -2550,7 +2557,7 @@ public abstract class PO
 				if (!changes && !updatedBy)
 				{
 					int AD_User_ID = Env.getContextAsInt(p_ctx, "#AD_User_ID");
-					set_ValueNoCheck("UpdatedBy", new Integer(AD_User_ID));
+					set_ValueNoCheck("UpdatedBy", Integer.valueOf(AD_User_ID));
 					sql.append("UpdatedBy=").append(AD_User_ID);
 					changes = true;
 					updatedBy = true;
@@ -2670,7 +2677,7 @@ public abstract class PO
 			if (!updatedBy)	//	UpdatedBy not explicitly set
 			{
 				int AD_User_ID = Env.getContextAsInt(p_ctx, "#AD_User_ID");
-				set_ValueNoCheck("UpdatedBy", new Integer(AD_User_ID));
+				set_ValueNoCheck("UpdatedBy", Integer.valueOf(AD_User_ID));
 				sql.append(",UpdatedBy=").append(AD_User_ID);
 			}
 			sql.append(" WHERE ").append(where);
@@ -2733,7 +2740,7 @@ public abstract class PO
 				log.severe("No NextID (" + no + ")");
 				return saveFinish (true, false);
 			}
-			m_IDs[0] = new Integer(no);
+			m_IDs[0] = Integer.valueOf(no);
 			set_ValueNoCheck(m_KeyColumns[0], m_IDs[0]);
 		}
 		if (m_trxName == null)
@@ -3052,6 +3059,12 @@ public abstract class PO
 
 		if (!force)
 		{
+			int clientId = Env.getAD_Client_ID(p_ctx);
+			if (clientId != getAD_Client_ID()) {
+				log.warning("Record is other client");	//	CannotDeleteTrx
+				log.saveError("CannotDeleteRecordOfAnotherClient", "", false);
+				return false;
+			}
 			int iProcessed = get_ColumnIndex("Processed");
 			if  (iProcessed != -1)
 			{
@@ -3603,6 +3616,9 @@ public abstract class PO
 			return false;
 		//	Get Node Table Name
 		AtomicReference<String> treeTableName = new AtomicReference<>();
+		AtomicInteger treeId = new AtomicInteger();
+		AtomicInteger parentColumnId = new AtomicInteger();
+		AtomicInteger sortColumnId = new AtomicInteger();
 		int elementId = 0;
 		if (tableId == X_C_ElementValue.Table_ID) {
 			Integer ii = (Integer)get_Value("C_Element_ID");
@@ -3610,52 +3626,63 @@ public abstract class PO
 				elementId = ii.intValue();
 				whereClause = "C_Element_ID = " + elementId;
 				MElement element = MElement.get(getCtx(), elementId, get_TrxName());
-				Optional.ofNullable(element.getTree()).ifPresent(tree ->{
+				Optional.ofNullable(element.getTree()).ifPresent(tree -> {
 					treeTableName.set(MTree.getNodeTableName(tree.getTreeType()));
+					treeId.set(element.getAD_Tree_ID());
+					parentColumnId.set(tree.getParent_Column_ID());
+					sortColumnId.set(tree.getAD_ColumnSortOrder_ID());
 				});
 			}
 		}
 		
-		if (treeTableName.get()==null)
+		if (treeTableName.get() == null) {
 			treeTableName.set(MTree.getNodeTableName(tableId));
+		}
 		
-		int m_AD_Tree_ID = MTree.getDefaultTreeIdFromTableId(getAD_Client_ID(), tableId, elementId);
+		if(treeId.get() <= 0) {
+			treeId.set(MTree.getDefaultTreeIdFromTableId(getAD_Client_ID(), tableId, elementId));
+		}
 		//	Valid tree
-		if(m_AD_Tree_ID < 0)
+		if(treeId.get() <= 0) {
+			return false;
+		}
+		
+		if (treeTableName.get() == null)
 			return false;
 		
-		if (treeTableName.get()==null)
-			return false;
-		
-		MTree tree = new MTree(getCtx(), m_AD_Tree_ID, get_TrxName());
+		if(elementId <= 0 ) {
+			MTree tree = new MTree(getCtx(), treeId.get(), get_TrxName());
+			parentColumnId.set(tree.getParent_Column_ID());
+			sortColumnId.set(tree.getAD_ColumnSortOrder_ID());
+		}
 		
 		PO treeNode = MTable.get(getCtx(), treeTableName.get()).getPO(0, get_TrxName());
 		treeNode.setAD_Client_ID(getAD_Client_ID());
 		treeNode.setAD_Org_ID(0);
 		treeNode.setIsActive(true);
-		treeNode.set_CustomColumn("AD_Tree_ID", m_AD_Tree_ID);
+		treeNode.set_CustomColumn("AD_Tree_ID", treeId.get());
 		treeNode.set_CustomColumn("Node_ID", get_ID());
 		//FR [ 729 ]
 		MColumn parentColumnIDforTree = null;
-		if (tree.getParent_Column_ID()>0) {
-			parentColumnIDforTree = MColumn.get(getCtx(), tree.getParent_Column_ID());
+		if (parentColumnId.get() > 0) {
+			parentColumnIDforTree = MColumn.get(getCtx(), parentColumnId.get());
 			treeNode.set_CustomColumn("Parent_ID", get_ValueAsInt(parentColumnIDforTree.getColumnName()));
-		}else
+		} else {
 			treeNode.set_CustomColumn("Parent_ID", 0);
+		}
 		
 		if (treeNode.get_ValueAsInt("Parent_ID") == 0 
-				&& tree.getAD_ColumnSortOrder_ID() > 0) {
-			MColumn columnSortforTree = MColumn.get(getCtx(), tree.getAD_ColumnSortOrder_ID());
+				&& sortColumnId.get() > 0) {
+			MColumn columnSortforTree = MColumn.get(getCtx(), sortColumnId.get());
 			treeNode.set_CustomColumn("Parent_ID", getParentFromSort(columnSortforTree.getColumnName(), get_ValueAsString(columnSortforTree.getColumnName()), whereClause));
 			if (parentColumnIDforTree!= null) {
-				if (treeNode.get_ValueAsInt("Parent_ID")!=get_ValueAsInt(parentColumnIDforTree.getColumnName())) {
+				if (treeNode.get_ValueAsInt("Parent_ID") != get_ValueAsInt(parentColumnIDforTree.getColumnName())) {
 					set_Value(parentColumnIDforTree.getColumnName(), treeNode.get_ValueAsInt("Parent_ID"));
 					saveEx();
 				}
 			}
 			
 		}
-		
 		
 		treeNode.set_CustomColumn("SeqNo", 999);
 		treeNode.saveEx();
@@ -3674,35 +3701,48 @@ public abstract class PO
 			return false;
 		//	Get Node Table Name
 		AtomicReference<String> treeTableName = new AtomicReference<>();
+		AtomicInteger treeId = new AtomicInteger();
+		AtomicInteger parentColumnId = new AtomicInteger();
+		AtomicInteger sortColumnId = new AtomicInteger();
 		int elementId = 0;
 		if (tableId == X_C_ElementValue.Table_ID) {
 			Integer ii = (Integer)get_Value("C_Element_ID");
 			if (ii != null) {
 				elementId = ii.intValue();
 				MElement element = MElement.get(getCtx(), elementId, get_TrxName());
-				Optional.ofNullable(element.getTree()).ifPresent(tree ->{
+				Optional.ofNullable(element.getTree()).ifPresent(tree -> {
 					treeTableName.set(MTree.getNodeTableName(tree.getTreeType()));
+					treeId.set(element.getAD_Tree_ID());
+					parentColumnId.set(tree.getParent_Column_ID());
+					sortColumnId.set(tree.getAD_ColumnSortOrder_ID());
 				});
 			}
 		}
 		
-		if (treeTableName.get()==null)
+		if (treeTableName.get() == null) {
 			treeTableName.set(MTree.getNodeTableName(tableId));
+		}
 		
-		int m_AD_Tree_ID = MTree.getDefaultTreeIdFromTableId(getAD_Client_ID(), tableId, elementId);
+		if(treeId.get() <= 0) {
+			treeId.set(MTree.getDefaultTreeIdFromTableId(getAD_Client_ID(), tableId, elementId));
+		}
 		//	Valid tree
-		if(m_AD_Tree_ID < 0)
+		if(treeId.get() <= 0) {
+			return false;
+		}
+		
+		if (treeTableName.get() == null)
 			return false;
 		
-		if (treeTableName.get()==null)
-			return false;
-		
-		MTree tree = new MTree(getCtx(), m_AD_Tree_ID, get_TrxName());
-		
+		if(elementId <= 0 ) {
+			MTree tree = new MTree(getCtx(), treeId.get(), get_TrxName());
+			parentColumnId.set(tree.getParent_Column_ID());
+			sortColumnId.set(tree.getAD_ColumnSortOrder_ID());
+		}
 		PO treeNode = MTable.get(getCtx(), treeTableName.get()).getPO("Node_ID = " + get_ID(), get_TrxName());
 		if (treeNode!=null) {
-			if (tree.getParent_Column_ID() > 0) {
-				MColumn columnIDforTree = MColumn.get(getCtx(), tree.getParent_Column_ID());
+			if (parentColumnId.get() > 0) {
+				MColumn columnIDforTree = MColumn.get(getCtx(), parentColumnId.get());
 				if (get_ValueAsInt(columnIDforTree.getColumnName())!= treeNode.get_ValueAsInt("Parent_ID")) {
 					treeNode.set_CustomColumn("Parent_ID", get_ValueAsInt(columnIDforTree.getColumnName()));
 					treeNode.saveEx();
@@ -3989,7 +4029,7 @@ public abstract class PO
 			pstmt = DB.prepareStatement(sql.toString(), trxName);
 			rs = pstmt.executeQuery();
 			while (rs.next())
-				list.add(new Integer(rs.getInt(1)));
+				list.add(Integer.valueOf(rs.getInt(1)));
 		}
 		catch (SQLException e)
 		{

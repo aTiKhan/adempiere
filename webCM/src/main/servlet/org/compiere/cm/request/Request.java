@@ -16,6 +16,7 @@
 package org.compiere.cm.request;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +33,9 @@ import org.compiere.util.DB;
  *	
  *  @author Kai Viiksaar
  *  @version $Id: Request.java,v 1.3 2006/10/16 11:34:47 comdivision Exp $
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class Request {
 
@@ -367,7 +371,7 @@ public class Request {
 				l_bdValue = new BigDecimal(0);
 			}
 		}
-		l_bdValue = l_bdValue.setScale(2, BigDecimal.ROUND_CEILING);
+		l_bdValue = l_bdValue.setScale(2, RoundingMode.CEILING);
 		return l_bdValue;
 	}
 	

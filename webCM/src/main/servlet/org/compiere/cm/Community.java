@@ -23,8 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.adempiere.core.domains.models.X_W_Store;
 import org.compiere.cm.utils.RequestAnalyzer;
-import org.compiere.model.X_W_Store;
 import org.compiere.util.CLogger;
 import org.compiere.util.WebEnv;
 import org.compiere.util.WebLogin;
@@ -36,6 +36,9 @@ import org.compiere.util.WebUtil;
  *	
  *  @author Yves Sandfort
  *  @version $Id$
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class Community extends HttpServletCM
 {

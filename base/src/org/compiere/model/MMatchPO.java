@@ -17,6 +17,7 @@
 package org.compiere.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.core.domains.models.X_M_MatchPO;
 import org.adempiere.engine.CostEngineFactory;
 import org.adempiere.engine.IDocumentLine;
 import org.compiere.util.CLogger;
@@ -551,7 +553,7 @@ public class MMatchPO extends X_M_MatchPO implements IDocumentLine
 					BigDecimal purchaseOrderAmount = purchaseOrderPrice.multiply(getQty());
 					BigDecimal maxTolerance = purchaseOrderAmount.multiply(priceMatchTolerance);
 					maxTolerance = maxTolerance.abs()
-						.divide(Env.ONEHUNDRED, 2, BigDecimal.ROUND_HALF_UP);
+						.divide(Env.ONEHUNDRED, 2, RoundingMode.HALF_UP);
 					difference = difference.abs();
 					boolean ok = difference.compareTo(maxTolerance) <= 0;
 					log.config("Difference=" + getPriceMatchDifference() 

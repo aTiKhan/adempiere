@@ -512,7 +512,7 @@ public class VLocator extends JComponent
 		if (M_Locator_ID == 0)
 			return false;
 
-		setValue (new Integer(M_Locator_ID), true);
+		setValue(Integer.valueOf(M_Locator_ID), true);
 		return true;
 	}	//	actionText
 
@@ -537,7 +537,7 @@ public class VLocator extends JComponent
 		log.info("");
 		//
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		AWindow frame = new AWindow();
+		AWindow frame = new AWindow(null);
 		
 		MQuery zoomQuery = new MQuery();
 		zoomQuery.addRestriction(MLocator.COLUMNNAME_M_Locator_ID, MQuery.EQUAL, getValue());

@@ -71,16 +71,7 @@ import org.compiere.util.Trace;
 public class FormFrame
 	implements ActionListener 
 {
-	/**
-	 * @deprecated
-	 *	Create Form.
-	 *  Need to call openForm
-	 */
-	public FormFrame ()
-	{
-		this(0);
-	}	//	FormFrame
-	
+
 	/**
 	 *	Create Form.
 	 *  Need to call openForm
@@ -128,15 +119,6 @@ public class FormFrame
 		m_MainContent = frame;
 		p_AD_Form_ID = frame.getAD_Form_ID();
 	}
-	
-	/**
-	 * 
-	 * @param gc
-	 */
-	@Deprecated
-	public FormFrame(GraphicsConfiguration gc) {
-		this(0);
-	}
 
 	private ProcessInfo  m_pi;
 	
@@ -169,7 +151,7 @@ public class FormFrame
 	 */
 	private void jbInit() throws Exception
 	{
-		setIconImage(org.compiere.Adempiere.getImage16());
+		setIconImage(org.adempiere.Adempiere.getImage16());
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 		setJMenuBar(menuBar);
 	}	//	jbInit

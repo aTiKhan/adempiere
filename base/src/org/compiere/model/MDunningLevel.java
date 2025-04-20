@@ -20,13 +20,18 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.I_C_DunningLevel;
+import org.adempiere.core.domains.models.X_C_DunningLevel;
+
 
 /**
  *	Dunning Level Model
  *	
  *  @author Jorg Janke
  *  @version $Id: MDunningLevel.java,v 1.3 2006/07/30 00:51:02 jjanke Exp $
- *  
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class MDunningLevel extends X_C_DunningLevel {
 	/**

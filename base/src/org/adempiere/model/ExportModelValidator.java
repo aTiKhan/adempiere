@@ -29,6 +29,8 @@
 
 package org.adempiere.model;
 
+import org.adempiere.core.domains.models.X_AD_ReplicationDocument;
+import org.adempiere.core.domains.models.X_AD_ReplicationTable;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.process.rpl.exp.ExportHelper;
 import org.compiere.model.MClient;
@@ -39,8 +41,6 @@ import org.compiere.model.MTable;
 import org.compiere.model.ModelValidationEngine;
 import org.compiere.model.ModelValidator;
 import org.compiere.model.PO;
-import org.compiere.model.X_AD_ReplicationDocument;
-import org.compiere.model.X_AD_ReplicationTable;
 import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import java.util.Properties;
@@ -61,6 +61,9 @@ import java.util.Properties;
  * <li> https://sourceforge.net/tracker/?func=detail&aid=3014094&group_id=176962&atid=879335
  *	@author Yamel Senih, ySenih@erpya.com, ERPCyA http://www.erpya.com
  *	<li> Add support to validate error fromreplication strategy
+ * @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  *	@version $Id$
  */
 public class ExportModelValidator implements ModelValidator {

@@ -320,9 +320,8 @@ public class TableElement extends PrintElement
 		{
 			int col = dataCol;
 			//	Print below existing column
-			if (m_additionalLines.containsKey(new Integer(dataCol)))
-			{
-				col = ((Integer)m_additionalLines.get(new Integer(dataCol))).intValue();
+			if (m_additionalLines.containsKey(Integer.valueOf(dataCol))) {
+				col = ((Integer)m_additionalLines.get(Integer.valueOf(dataCol))).intValue();
 				if (log.isLoggable(Level.FINEST)) log.finest("DataColumn=" + dataCol + ", BelowColumn=" + col);
 			}
 			float colWidth = 0;
@@ -574,20 +573,20 @@ public class TableElement extends PrintElement
 			//	Print below existing column
 			if (col != dataCol)
 			{
-				m_columnWidths.add(new Float(0.0));		//	for the data column
+				m_columnWidths.add(Float.valueOf((float) 0.0));		//	for the data column
 				Float origWidth = (Float)m_columnWidths.get(col);
 				if (origWidth == null)
 					log.log(Level.SEVERE, "Column " + dataCol + " below " + col + " - no value for orig width");
 				else
 				{
-					if (origWidth.compareTo(new Float(colWidth)) >= 0)
+					if (origWidth.compareTo(Float.valueOf(colWidth)) >= 0)
 					{
 						log.finest("Same Width - Col=" + col 
 								+ " - OrigWidth=" + origWidth + " - Width=" + colWidth + " - Total=" + p_width);
 					}
 					else
 					{
-						m_columnWidths.set(col, new Float(colWidth));
+						m_columnWidths.set(col, Float.valueOf(colWidth));
 						p_width += (colWidth - origWidth.floatValue());
 						log.finest("New Width - Col=" + col 
 								+ " - OrigWidth=" + origWidth + " - Width=" + colWidth + " - Total=" + p_width);
@@ -597,7 +596,7 @@ public class TableElement extends PrintElement
 			//	Add new Column
 			else
 			{
-				m_columnWidths.add(new Float(colWidth));
+				m_columnWidths.add(Float.valueOf(colWidth));
 				p_width += colWidth;
 				if (log.isLoggable(Level.FINEST)) log.finest("Width - Col=" + dataCol 
 						+ " - Width=" + colWidth + " - Total=" + p_width);
@@ -630,7 +629,7 @@ public class TableElement extends PrintElement
 			under = under == 2 ? under *  m_tFormat.getLineStroke().floatValue() + V_GAP : under *  m_tFormat.getLineStroke().floatValue();
 			rowHeight += over + under;
 			rowHeight += m_tFormat.getLineStroke().floatValue() + (2*V_GAP);
-			m_rowHeights.add(new Float(rowHeight));
+			m_rowHeights.add(Float.valueOf(rowHeight));
 			p_height += rowHeight;
 		}	//	for all rows
 		//	HeaderRow
@@ -654,8 +653,8 @@ public class TableElement extends PrintElement
 		if (m_firstPage.height >= p_height && m_pageBreak.size() == 0)
 		{
 			if (log.isLoggable(Level.FINEST)) log.finest("Page Y=1 - PageHeight=" + m_firstPage.height + " - TableHeight=" + p_height);
-			m_firstRowOnPage.add(new Integer(0));	//	Y
-			m_pageHeight.add(new Float(p_height));	//	Y index only
+			m_firstRowOnPage.add(Integer.valueOf(0));	//	Y
+			m_pageHeight.add(Float.valueOf(p_height));	//	Y index only
 		}
 		//	multiple pages on Y | Axis
 		else
@@ -692,10 +691,10 @@ public class TableElement extends PrintElement
 				if (pageBreak)
 				{
 					availableHeight = firstPage ? m_firstPage.height : m_nextPages.height;
-					m_firstRowOnPage.add(new Integer(dataRow+addlRows));	//	Y
+					m_firstRowOnPage.add(Integer.valueOf(dataRow+addlRows));	//	Y
 					if (!firstPage)
 					{
-						m_pageHeight.add(new Float(usedHeight));	//	Y index only
+						m_pageHeight.add(Float.valueOf(usedHeight));	//	Y index only
 						if (log.isLoggable(Level.FINEST)) log.finest("Page Y=" + m_pageHeight.size()
 								+ " - PageHeight=" + usedHeight);
 					}
@@ -718,7 +717,7 @@ public class TableElement extends PrintElement
 					+ ", Row=" + dataRow + ",AddlRows=" + addlRows + ", Height=" + rowHeight 
 					+ " - Available=" + availableHeight + ", Used=" + usedHeight);
 			}	//	for all rows
-			m_pageHeight.add(new Float(usedHeight));			//	Y index only
+			m_pageHeight.add(Float.valueOf(usedHeight));			//	Y index only
 			if (log.isLoggable(Level.FINEST)) log.finest("Page Y=" + m_pageHeight.size()
 					+ " - PageHeight=" + usedHeight);
 		}	//	multiple Y | pages
@@ -728,7 +727,7 @@ public class TableElement extends PrintElement
 		{
 			if (log.isLoggable(Level.FINEST)) log.finest("Page X=1 - PageWidth=" + m_firstPage.width 
 					+ " - TableWidth=" + p_width);
-			m_firstColumnOnPage.add(new Integer(0));	//	X
+			m_firstColumnOnPage.add(Integer.valueOf(0));	//	X
 			//
 			distributeColumns (m_firstPage.width-(int)p_width, 0, m_columnWidths.size());
 		}
@@ -746,7 +745,7 @@ public class TableElement extends PrintElement
 					if (col != 0)
 						distributeColumns (availableWidth, lastStart, col);
 					//
-					m_firstColumnOnPage.add(new Integer(col));	//	X
+					m_firstColumnOnPage.add(Integer.valueOf(col));	//	X
 					if (log.isLoggable(Level.FINEST)) log.finest("Page X=" + m_firstColumnOnPage.size()
 							+ " - Col=" + col);
 					lastStart = col;
@@ -801,12 +800,12 @@ public class TableElement extends PrintElement
 					int additionalPart = columnWidth * availableWidth / totalWidth;
 					if (remainingWidth < additionalPart)
 					{
-						m_columnWidths.set(col, new Float(columnWidth+remainingWidth));
+						m_columnWidths.set(col, Float.valueOf(columnWidth + remainingWidth));
 						remainingWidth = 0;
 					}
 					else
 					{
-						m_columnWidths.set(col, new Float(columnWidth+additionalPart));
+						m_columnWidths.set(col, Float.valueOf(columnWidth + additionalPart));
 						remainingWidth -= additionalPart;
 					}
 					if (log.isLoggable(Level.FINEST)) log.finest("  col=" + col + " - From " + columnWidth + " to " + m_columnWidths.get(col));
@@ -819,7 +818,7 @@ public class TableElement extends PrintElement
 			int columnWidth = ((Float)m_columnWidths.get(c)).intValue();
 			if (columnWidth > 0)
 			{
-				m_columnWidths.set(c, new Float(columnWidth+remainingWidth));
+				m_columnWidths.set(c, Float.valueOf(columnWidth + remainingWidth));
 				if (log.isLoggable(Level.FINEST)) log.finest("Final col=" + c + " - From " + columnWidth + " to " + m_columnWidths.get(c));
 				remainingWidth = 0;
 			}
@@ -1129,7 +1128,7 @@ public class TableElement extends PrintElement
 		String tableName = MQuery.getZoomTableName(columnName);
 		Object code = pp.getID();
 		if (pp instanceof KeyNamePair)
-			code = new Integer(((KeyNamePair)pp).getKey());
+			code = Integer.valueOf(((KeyNamePair) pp).getKey());
 		//
 		MQuery query = new MQuery(tableName);
 		query.addRestriction(columnName, MQuery.EQUAL, code, null, pp.toString());
@@ -1752,11 +1751,11 @@ public class TableElement extends PrintElement
             else
             {
                 //  next line is a function column -> underline this
-                boolean nextIsFunction = m_functionRows.contains(new Integer(row+1));
-                if (nextIsFunction && m_functionRows.contains(new Integer(row)))
+                boolean nextIsFunction = m_functionRows.contains(Integer.valueOf(row + 1));
+                if (nextIsFunction && m_functionRows.contains(Integer.valueOf(row))) {
                     nextIsFunction = false;     //  this is a function line too
-                if (nextIsFunction || (m_finReportSumRows.contains(new Integer(row + 1)) && getReportLine(row + 1,col) != null))
-                {
+				}
+                if (nextIsFunction || (m_finReportSumRows.contains(Integer.valueOf(row + 1)) && getReportLine(row + 1,col) != null)) {
                     g2D.setPaint(m_tFormat.getFunctFG_Color());
                     g2D.setStroke(m_tFormat.getHLine_Stroke());
                     g2D.drawLine(origX, curY,               //   -> - (bottom)

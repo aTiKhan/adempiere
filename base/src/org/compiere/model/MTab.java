@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+import org.adempiere.core.domains.models.I_AD_Field;
+import org.adempiere.core.domains.models.X_AD_Tab;
 import org.adempiere.exceptions.FillMandatoryException;
 import org.compiere.util.CCache;
 import org.compiere.util.CLogger;
@@ -243,7 +245,7 @@ public class MTab extends X_AD_Tab
 	 *	@return MProcess
 	 */
 	public static MTab get (Properties ctx, int tabId) {
-		Integer key = new Integer (tabId);
+		Integer key = Integer.valueOf(tabId);
 		MTab retValue = (MTab) s_cache.get (key);
 		if (retValue != null)
 			return retValue;

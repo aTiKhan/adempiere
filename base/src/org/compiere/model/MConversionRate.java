@@ -18,6 +18,7 @@ package org.compiere.model;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.I_C_Conversion_Rate;
+import org.adempiere.core.domains.models.X_C_Conversion_Rate;
 import org.compiere.util.CCache;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
@@ -129,7 +132,7 @@ public class MConversionRate extends X_C_Conversion_Rate
 		retValue = retValue.multiply(Amt);
 		int stdPrecision = MCurrency.getStdPrecision(ctx, CurTo_ID);
 		if (retValue.scale() > stdPrecision)
-			retValue = retValue.setScale(stdPrecision, BigDecimal.ROUND_HALF_UP);
+			retValue = retValue.setScale(stdPrecision, RoundingMode.HALF_UP);
 			
 		return retValue;
 	}	//	convert
@@ -320,7 +323,7 @@ public class MConversionRate extends X_C_Conversion_Rate
 		if (C_Conversion_Rate_ID <= 0) {
 			return null;
 		}
-		Integer key = new Integer (C_Conversion_Rate_ID);
+		Integer key = Integer.valueOf(C_Conversion_Rate_ID);
 		MConversionRate retValue = (MConversionRate) s_cache.get (key);
 		if (retValue != null) {
 			return retValue;

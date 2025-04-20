@@ -73,8 +73,9 @@ import org.compiere.util.Env;
 import org.compiere.util.Language;
 import org.compiere.util.Msg;
 import org.compiere.util.Trx;
-import org.eevolution.model.MDDOrder;
-import org.eevolution.model.MDDOrderLine;
+import org.eevolution.distribution.model.MDDOrder;
+import org.eevolution.distribution.model.MDDOrderLine;
+import org.eevolution.distribution.services.InventoryMovementService;
 
 /**
  *	Create Movement for Material Receipt from Distribution Order
@@ -480,7 +481,7 @@ public class VOrderDistributionReceipt extends CPanel
 			if(QtyDeliver == null | QtyDeliver.compareTo(oline.getQtyInTransit()) > 0)
 				 throw new AdempiereException("Error in Qty");
 			
-			line.setOrderLine(oline, QtyDeliver, true);
+			InventoryMovementService.setMovementOrderLine(line, oline, QtyDeliver, true);
 			line.saveEx();
 		}
 		
@@ -558,7 +559,7 @@ public class VOrderDistributionReceipt extends CPanel
 		             PrintInfo info = new PrintInfo(MMovement.Table_Name,MMovement.Table_ID, movement.getM_Movement_ID());               
 		             ReportEngine re = new ReportEngine(Env.getCtx(), format, query, info);
 		             re.print();
-                     new Viewer(re);
+					new Viewer(null, re);
 
              	//	Yamel Senih FR [ 114 ] 2015-11-23
 				ADialogDialog d = new ADialogDialog (m_frame.getCFrame(),

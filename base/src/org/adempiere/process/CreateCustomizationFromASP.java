@@ -19,10 +19,10 @@ package org.adempiere.process;
 
 import java.util.Enumeration;
 
+import org.adempiere.core.domains.models.I_AD_Menu;
+import org.adempiere.core.domains.models.I_ASP_Level;
 import org.adempiere.model.MBrowse;
 import org.adempiere.model.MBrowseField;
-import org.compiere.model.I_AD_Menu;
-import org.compiere.model.I_ASP_Level;
 import org.compiere.model.MBrowseCustom;
 import org.compiere.model.MBrowseFieldCustom;
 import org.compiere.model.MClientInfo;
@@ -72,7 +72,7 @@ public class CreateCustomizationFromASP extends CreateCustomizationFromASPAbstra
 	
 	@Override
 	protected String doIt() throws Exception {
-		MClientInfo clientInfo = MClientInfo.get(getCtx(), getAD_Client_ID());
+		MClientInfo clientInfo = MClientInfo.get(getCtx(), getAD_Client_ID(), get_TrxName());
 		int AD_Tree_ID = clientInfo.getAD_Tree_Menu_ID();
 		MTree thisTree = new MTree (getCtx(), AD_Tree_ID, true, true, null, get_TrxName());
 		MTreeNode node;

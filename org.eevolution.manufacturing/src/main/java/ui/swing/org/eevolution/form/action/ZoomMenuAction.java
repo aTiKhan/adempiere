@@ -25,7 +25,7 @@ import org.compiere.apps.AEnv;
 import org.compiere.apps.AWindow;
 import org.compiere.model.MQuery;
 import org.compiere.model.PO;
-import org.eevolution.model.wrapper.AbstractPOWrapper;
+import org.eevolution.manufacturing.model.wrapper.AbstractPOWrapper;
 
 
 /**
@@ -179,7 +179,7 @@ public class ZoomMenuAction extends PopupAction {
 		MQuery query = new MQuery();
 		query.setTableName(tablename);
 
-		AWindow window = new AWindow();
+		AWindow window = new AWindow(null);
 		if (window.initWindow(tableid, query)) {
 		
 			AEnv.showCenterScreen(window);

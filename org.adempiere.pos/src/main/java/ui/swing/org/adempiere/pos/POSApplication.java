@@ -22,7 +22,7 @@ import java.util.Properties;
 
 import javax.swing.JFrame;
 
-import org.compiere.Adempiere;
+import org.adempiere.Adempiere;
 import org.compiere.apps.AEnv;
 import org.compiere.apps.AKeyboardFocusManager;
 import org.compiere.apps.ALogin;
@@ -49,7 +49,7 @@ public class POSApplication {
 	public POSApplication() {
 		Adempiere.startup(true);	//	needs to be here for UI
 		Splash splash = Splash.getSplash();
-		final FormFrame frame = new FormFrame(splash.getGraphicsConfiguration());
+		final FormFrame frame = new FormFrame(0);
 		//  Focus Traversal
 		KeyboardFocusManager.setCurrentKeyboardFocusManager(AKeyboardFocusManager.get());
 		

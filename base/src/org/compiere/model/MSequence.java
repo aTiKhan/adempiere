@@ -34,6 +34,7 @@ import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 
+import org.adempiere.core.domains.models.X_AD_Sequence;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.compiere.db.CConnection;
@@ -1433,7 +1434,7 @@ public class MSequence extends X_AD_Sequence
 				try
 				{
 					int no = DB.getNextID(0, "Test", null);
-					s_list.add(new Integer(no));
+					s_list.add(Integer.valueOf(no));
 				//	System.out.println("#" + m_i + ": " + no);
 				}
 				catch (Exception e)

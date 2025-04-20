@@ -20,6 +20,14 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Properties;
 
+import org.adempiere.core.domains.models.I_CM_CStageTTable;
+import org.adempiere.core.domains.models.I_CM_Container;
+import org.adempiere.core.domains.models.I_CM_ContainerTTable;
+import org.adempiere.core.domains.models.X_CM_CStageTTable;
+import org.adempiere.core.domains.models.X_CM_CStage_Element;
+import org.adempiere.core.domains.models.X_CM_Container;
+import org.adempiere.core.domains.models.X_CM_ContainerTTable;
+import org.adempiere.core.domains.models.X_CM_Container_Element;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 
@@ -29,6 +37,9 @@ import org.compiere.util.DB;
  * @author Yves Sandfort
  * @version $Id: MContainer.java,v 1.20 2006/09/05 23:22:53 comdivision Exp $
  * FR: [ 2214883 ] Remove SQL code and Replace for Query - red1/trifon
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class MContainer extends X_CM_Container
 {

@@ -56,7 +56,7 @@ public class ReportInfo
         to the main Report in case of subreports. Marco LOMBARDO
     */
     private JasperReport jasperReport;
-    private HashMap subReport = new HashMap();
+    private HashMap<String, String> subReport = new HashMap<String, String>();
     private boolean hasSubReport = false;
     private boolean hasError = false;
     private ArrayList errorMsg = new ArrayList();
@@ -179,7 +179,7 @@ public class ReportInfo
         ResultSet rs = null;
         try
         {
-            pstmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+			pstmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, null);
             pstmt.setInt(1, AD_Process_ID);
             rs = pstmt.executeQuery();
             String path = null;
@@ -371,7 +371,7 @@ public class ReportInfo
     /**
      * @return Returns the subReport.
      */
-    protected HashMap getSubReport()
+    protected HashMap<String, String> getSubReport()
     {
         return subReport;
     }

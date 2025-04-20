@@ -17,13 +17,14 @@
 package org.compiere.process;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.compiere.model.I_C_Order;
+import org.adempiere.core.domains.models.I_C_Order;
 import org.compiere.model.MClient;
 import org.compiere.model.MInOut;
 import org.compiere.model.MInOutLine;
@@ -365,7 +366,7 @@ public class InOutGenerate extends InOutGenerateAbstract {
 			if (orderLine.getQtyEntered().compareTo(orderLine.getQtyOrdered()) != 0)
 				line.setQtyEntered(qty
 					.multiply(orderLine.getQtyEntered())
-					.divide(orderLine.getQtyOrdered(), 12, BigDecimal.ROUND_HALF_UP));
+					.divide(orderLine.getQtyOrdered(), 12, RoundingMode.HALF_UP));
 			line.setLine(m_line + orderLine.getLine());
 			line.saveEx();
 			log.fine(line.toString());
@@ -420,7 +421,7 @@ public class InOutGenerate extends InOutGenerateAbstract {
 				line.setQty(line.getMovementQty().add(deliver));
 			if (orderLine.getQtyEntered().compareTo(orderLine.getQtyOrdered()) != 0)
 				line.setQtyEntered(line.getMovementQty().multiply(orderLine.getQtyEntered())
-					.divide(orderLine.getQtyOrdered(), 12, BigDecimal.ROUND_HALF_UP));
+					.divide(orderLine.getQtyOrdered(), 12, RoundingMode.HALF_UP));
 			line.setLine(m_line + orderLine.getLine());
 			line.saveEx();
 			log.fine("ToDeliver=" + qty + "/" + deliver + " - " + line);

@@ -120,7 +120,7 @@ public class WPOSTable extends WListbox {
 					}	
 					else if (columnClass == Boolean.class)
 					{
-						data = rs.getString(rsColIndex) == null ?  new Boolean(false) : new Boolean(rs.getString(rsColIndex).equals("Y"));
+						data = rs.getString(rsColIndex) == null ? Boolean.FALSE : Boolean.valueOf(rs.getString(rsColIndex).equals("Y"));
 					}
 					else if (columnClass == Timestamp.class)
 					{
@@ -132,11 +132,11 @@ public class WPOSTable extends WListbox {
 					}
 					else if (columnClass == Double.class)
 					{
-						data = new Double(rs.getDouble(rsColIndex));
+						data = Double.valueOf(rs.getDouble(rsColIndex));
 					}
 					else if (columnClass == Integer.class)
 					{
-						data = new Integer(rs.getInt(rsColIndex));
+						data = Integer.valueOf(rs.getInt(rsColIndex));
 					}
 					else if (columnClass == KeyNamePair.class)
 					{
@@ -235,7 +235,7 @@ public class WPOSTable extends WListbox {
 					}
 					else if (columnClass == Double.class)
 					{
-						data = new Double(((BigDecimal)data).doubleValue());
+						data = Double.valueOf(((BigDecimal) data).doubleValue());
 					}
 				}
 				//  store

@@ -19,6 +19,7 @@ package org.compiere.process;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import org.adempiere.core.domains.models.X_I_BankStatement;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBank;
 import org.compiere.model.MBankStatement;
@@ -26,7 +27,6 @@ import org.compiere.model.MBankStatementLine;
 import org.compiere.model.MInvoice;
 import org.compiere.model.MOrgInfo;
 import org.compiere.model.MPayment;
-import org.compiere.model.X_I_BankStatement;
 import org.compiere.util.AdempiereUserError;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
@@ -43,6 +43,9 @@ import org.compiere.util.Util;
  *  @author Victor Perez, victor.perez@e-evolution.com , http://e-evolution.com
  *  [Bug Report] Transaction blocking error when creating payment from the account statement and immediate posting #3429
  *  https://github.com/adempiere/adempiere/issues/3429
+ *  @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
  */
 public class BankStatementPayment extends BankStatementPaymentAbstract {
 

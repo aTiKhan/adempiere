@@ -20,7 +20,7 @@ import java.util.Calendar;
 import org.compiere.model.MChart;
 import org.compiere.model.MGoal;
 import org.compiere.model.MMeasure;
-import org.compiere.model.X_PA_Goal;
+import org.adempiere.core.domains.models.X_PA_Goal;
 import org.compiere.util.CLogger;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -87,10 +87,7 @@ public class GraphBuilder {
 			{
 				return createWaterfallChart();
 			}
-			else
-			{
-				throw new IllegalArgumentException("unknown chart type=" + type);
-			}
+			return createBarChart();
 		}
 	}
 

@@ -91,7 +91,7 @@ public class ModelInterfaceGenerator
 		+" * Copyright (C) 2006-2017 ADempiere Foundation, All Rights Reserved.         *\n"
 		+" * This program is free software, you can redistribute it and/or modify it    *\n"
 		+" * under the terms version 2 of the GNU General Public License as published   *\n"
-		+" * or (at your option) any later version.										*\n"
+		+" * or (at your option) any later version.                                     *\n"
 		+" * by the Free Software Foundation. This program is distributed in the hope   *\n"
 		+" * that it will be useful, but WITHOUT ANY WARRANTY, without even the implied *\n"
 		+" * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.           *\n"
@@ -100,7 +100,8 @@ public class ModelInterfaceGenerator
 		+" * with this program, if not, write to the Free Software Foundation, Inc.,    *\n"
 		+" * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.                     *\n"
 		+" * For the text or an alternative of this public license, you may reach us    *\n"
-		+" * or via info@adempiere.net or http://www.adempiere.net/license.html         *\n"
+		+" * or via info@adempiere.net                                                  *\n"
+		+" * or https://github.com/adempiere/adempiere/blob/develop/license.html        *\n"
 		+" *****************************************************************************/\n";
 	
 	/** Logger */
@@ -178,11 +179,12 @@ public class ModelInterfaceGenerator
 			.append("package ").append(packageName).append(";").append(NL)
 		;
 		
-		if (!packageName.equals("org.compiere.model")) {
-			addImportClass("org.compiere.model.*");
+		if (!packageName.equals("org.adempiere.core.domains.models")) {
+			addImportClass("org.adempiere.core.domains.models.*");
 		}
 		addImportClass(java.math.BigDecimal.class);
 		addImportClass(org.compiere.util.KeyNamePair.class);
+		addImportClass(org.compiere.model.MTable.class);
 		
 		createImports(start);
 		// Interface
@@ -603,8 +605,10 @@ public class ModelInterfaceGenerator
 	 */
 	public static String getModelPackage(String entityType)
 	{
+		return "org.adempiere.core.domains.models";
+		/* Comment whe switch to new package core anemic model class org.adempiere.core.domains.models
 		if ("D".equals(entityType))
-			return "org.compiere.model";
+			return "org.adempiere.core.domains.models";
 
 		for (MEntityType entity : MEntityType.getEntityTypes(Env.getCtx()))
 		{
@@ -613,7 +617,8 @@ public class ModelInterfaceGenerator
 				return entity.getModelPackage();
 			}
 		}
-		return null;
+
+		return null;*/
 	}
 	
 	public static String getFieldName(String columnName)
@@ -624,6 +629,25 @@ public class ModelInterfaceGenerator
 		else
 			fieldName = columnName.substring(0, columnName.length() - 3);
 		return fieldName;
+	}
+	
+	/**
+	 * Validate if is a native model package name or is a new module
+	 * @param modelpackage
+	 * @return
+	 */
+	private static boolean isCoreModelpackage(String modelpackage) {
+		if(modelpackage == null) {
+			return false;
+		}
+		return modelpackage.equals("org.compiere.model") 
+				|| modelpackage.equals("org.compiere.report") 
+				|| modelpackage.equals("org.compiere.print") 
+				|| modelpackage.equals("compiere.model") 
+				|| modelpackage.equals("adempiere.model") 
+				|| modelpackage.equals("org.adempiere.model") 
+				|| modelpackage.equals("org.eevolution.model") 
+				|| modelpackage.equals("org.spin.model");
 	}
 	
 	public static String getReferenceClassName(int AD_Table_ID, String columnName, int displayType, int AD_Reference_ID)
@@ -645,10 +669,13 @@ public class ModelInterfaceGenerator
 				{						
 					referenceClassName = modelpackage+"."+referenceClassName;
 				}
-				if (!isGenerateModelGetterForEntity(AD_Table_ID, entityType))
+				/* Comment whe switch to new package core anemic model class org.adempiere.core.domains.models
+				if (!isGenerateModelGetterForEntity(AD_Table_ID, entityType)
+						|| !isCoreModelpackage(modelpackage))
 				{
 					referenceClassName = null; 
 				}
+				*/
 			}
 			else
 			{
@@ -691,10 +718,13 @@ public class ModelInterfaceGenerator
 						{
 							referenceClassName = modelpackage+"."+referenceClassName;
 						}
-						if (!isGenerateModelGetterForEntity(AD_Table_ID, entityType))
+						/* Comment whe switch to new package core anemic model class org.adempiere.core.domains.models
+						if (!isGenerateModelGetterForEntity(AD_Table_ID, entityType)
+								|| !isCoreModelpackage(modelpackage))
 						{
 							referenceClassName = null;
 						}
+						*/
 					}
 				}
 			}

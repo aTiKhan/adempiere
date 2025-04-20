@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
@@ -43,6 +44,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.adempiere.core.domains.models.I_AD_Attachment;
+import org.adempiere.core.domains.models.X_AD_Attachment;
 import org.compiere.util.Env;
 import org.compiere.util.MimeType;
 import org.spin.util.AttachmentUtil;
@@ -60,6 +63,7 @@ import org.xml.sax.SAXException;
  *	One Attachment can have multiple entries
  *	
  *  @author Jorg Janke
+ *  @version $Id: MAttachment.java,v 1.4 2006/07/30 00:58:37 jjanke Exp $
  *  
   * @author Silvano Trinchero
  *      <li>BF [ 2992291] MAttachment.addEntry not closing streams if an exception occur
@@ -67,7 +71,10 @@ import org.xml.sax.SAXException;
  *	@author Yamel Senih, ysenih@erpya.com , http://www.erpya.com
  *	<li> FR [ 2167 ] Validate MimeType and file extension
  * 	@see https://github.com/adempiere/adempiere/issues/2167
- *  @version $Id: MAttachment.java,v 1.4 2006/07/30 00:58:37 jjanke Exp $
+ *
+ * 	@author Edwin Betancourt, EdwinBetanc0urt@outlook.com, https://github.com/EdwinBetanc0urt
+ * 		@see <a href="https://github.com/adempiere/adempiere/issues/4176">
+ * 		BR [ 4176 ] File Handler not supported on `System` client.</a>
  */
 public class MAttachment extends X_AD_Attachment
 {
@@ -507,6 +514,11 @@ public class MAttachment extends X_AD_Attachment
 	 *	@return true if saved
 	 */
 	private boolean saveLOBData() {
+		Optional<ArrayList<MAttachmentEntry>> maybeItems = Optional.ofNullable(items);
+		if (!maybeItems.isPresent() || items.size() == 0) {
+			setBinaryData(null);
+			return true;
+		}
 		if(AttachmentUtil.getInstance().isValidForClient(getAD_Client_ID())) {
 			items.stream().forEach(item -> {
 				try {
@@ -620,8 +632,15 @@ public class MAttachment extends X_AD_Attachment
 						}
 						final File destFile = new File(m_attachmentPathRoot + File.separator
 								+ getAttachmentPathSnippet() + File.separator + entryFile.getName());
-						in = new FileInputStream(entryFile).getChannel();
-						out = new FileOutputStream(destFile).getChannel();
+
+						FileOutputStream outputStream = new FileOutputStream(destFile);
+						out = outputStream.getChannel();
+						outputStream.close();
+
+						FileInputStream inputStream = new FileInputStream(entryFile);
+						in = inputStream.getChannel();
+						inputStream.close();
+
 						in.transferTo(0, in.size(), out);
 						in.close();
 						out.close();
@@ -1024,7 +1043,6 @@ public class MAttachment extends X_AD_Attachment
 		}
 		log.fine("updateEntry - " + file);
 		//
-		String name = file.getName();
 		byte[] data = null;
 		try
 		{

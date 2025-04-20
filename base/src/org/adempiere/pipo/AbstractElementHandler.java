@@ -13,7 +13,12 @@
  *                                                                            *
  * Copyright (C) 2005 Robert Klein. robeklein@hotmail.com                     * 
  * Contributor(s): Low Heng Sin hengsin@avantz.com                            *
- *****************************************************************************/
+ * ****************************************************************************
+ *
+ * @author Raul Capecce, raul.capecce@solopsoftware.com, Solop https://solopsoftware.com/
+ *		<a href="https://github.com/adempiere/adempiere/issues/4188">
+ * 		@see BF [ 4188 ] Badly formatted end of line in files</a>
+ */
 package org.adempiere.pipo;
 
 import java.io.FileInputStream;
@@ -27,9 +32,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 
 import javax.xml.transform.sax.TransformerHandler;
+
+import org.adempiere.core.domains.models.X_AD_Package_Imp_Detail;
 import org.compiere.model.PO;
 import org.compiere.model.POInfo;
-import org.compiere.model.X_AD_Package_Imp_Detail;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;

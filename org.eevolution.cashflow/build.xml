@@ -93,10 +93,12 @@
         <attribute name="Implementation-Version" value="${env.ADEMPIERE_VERSION} ${DSTAMP}-${TSTAMP}"/>
         <attribute name="Implementation-Vendor" value="${env.ADEMPIERE_VENDOR}"/> 
         <attribute name="Implementation-URL" value="http://www.adempiere.net"/>
-        <attribute name="Main-Class" value="org.compiere.Adempiere"/>
+        <attribute name="Main-Class" value="org.adempiere.Adempiere"/>
         <attribute name="Class-Path" value="liberoCashflow.jar"/>
       </manifest> 
     </jar>
+  	<copy file="../tools/lib/legacy/cashflow-support-legacy-1.0.0.jar" todir="${env.ADEMPIERE_HOME}/packages/CashflowManagement/lib" />
+  	<copy file="../tools/lib/legacy/cashflow-support-legacy-1.0.0.jar" todir="../packages/" />
   </target>
 
 

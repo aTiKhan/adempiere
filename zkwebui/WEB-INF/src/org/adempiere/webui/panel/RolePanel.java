@@ -40,6 +40,7 @@ import org.adempiere.webui.util.UserPreference;
 import org.adempiere.webui.window.LoginWindow;
 import org.compiere.model.MRole;
 import org.compiere.model.MSysConfig;
+import org.compiere.model.MUser;
 import org.compiere.util.Env;
 import org.compiere.util.KeyNamePair;
 import org.compiere.util.Language;
@@ -60,8 +61,6 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Image;
-
-import javax.servlet.http.HttpSession;
 
 import static org.adempiere.webui.session.SessionContextListener.SERVLET_SESSION_ID;
 
@@ -113,6 +112,32 @@ public class RolePanel extends Window implements EventListener, Deferrable
         //Load the User preferences
         String sessionId = Env.getContext(Env.getCtx(), SERVLET_SESSION_ID);
         SessionManager.setUserAuthentication(sessionId, password);
+        SessionManager.loadUserPreference(login.getAuthenticatedUserId());
+        initComponents();
+        init();
+        this.setId("rolePanel");
+
+        AuFocus auf = new AuFocus(lstRole);
+        Clients.response(auf);
+    }
+	
+	/**
+	 * Constructor
+	 * @param ctx
+	 * @param loginWindow
+	 * @param user
+	 */
+	public RolePanel(Properties ctx, LoginWindow loginWindow, MUser user)
+    {
+        this.wndLogin = loginWindow;
+        m_ctx = ctx;
+        login = new Login(ctx);
+        rolesKNPairs = login.getRoles(user);
+        if(rolesKNPairs == null)
+            throw new ApplicationException("Login is invalid, User: " + user.getValue());
+        //Load the User preferences
+        String sessionId = Env.getContext(Env.getCtx(), SERVLET_SESSION_ID);
+        SessionManager.setUserAuthentication(sessionId, sessionId);
         SessionManager.loadUserPreference(login.getAuthenticatedUserId());
         initComponents();
         init();
@@ -316,7 +341,7 @@ public class RolePanel extends Window implements EventListener, Deferrable
         	//  initial client - Elaine 2009/02/06
         	UserPreference userPreference = SessionManager.getUserPreference();
 			String initDefault = userPreference.getProperty(UserPreference.P_CLIENT);
-            KeyNamePair roleKNPair = new KeyNamePair(new Integer((String)lstItemRole.getValue()), lstItemRole.getLabel());
+            KeyNamePair roleKNPair = new KeyNamePair(Integer.valueOf((String) lstItemRole.getValue()), lstItemRole.getLabel());
             KeyNamePair clientKNPairs[] = login.getClients(roleKNPair);
             if(clientKNPairs != null && clientKNPairs.length > 0)
             {
@@ -349,7 +374,7 @@ public class RolePanel extends Window implements EventListener, Deferrable
 			//  initial organisation - Elaine 2009/02/06
         	UserPreference userPreference = SessionManager.getUserPreference();
 			String initDefault = userPreference.getProperty(UserPreference.P_ORG);
-            KeyNamePair clientKNPair = new KeyNamePair(new Integer((String)lstItemClient.getValue()), lstItemClient.getLabel());
+            KeyNamePair clientKNPair = new KeyNamePair(Integer.valueOf((String)lstItemClient.getValue()), lstItemClient.getLabel());
             KeyNamePair orgKNPairs[] = login.getOrgs(clientKNPair);
             if(orgKNPairs != null && orgKNPairs.length > 0)
             {
@@ -379,7 +404,7 @@ public class RolePanel extends Window implements EventListener, Deferrable
 			//  initial warehouse - Elaine 2009/02/06
         	UserPreference userPreference = SessionManager.getUserPreference();
 			String initDefault = userPreference.getProperty(UserPreference.P_WAREHOUSE);
-            KeyNamePair organisationKNPair = new KeyNamePair(new Integer((String)lstItemOrganisation.getValue()), lstItemOrganisation.getLabel());
+            KeyNamePair organisationKNPair = new KeyNamePair(Integer.valueOf((String)lstItemOrganisation.getValue()), lstItemOrganisation.getLabel());
             KeyNamePair warehouseKNPairs[] = login.getWarehouses(organisationKNPair);
             if(warehouseKNPairs != null && warehouseKNPairs.length > 0)
             {

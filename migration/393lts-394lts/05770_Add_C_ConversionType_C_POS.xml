@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Migrations>
-  <Migration EntityType="D" Name="Employee Birthdate" ReleaseNo="3.9.1" SeqNo="5770">
+  <Migration EntityType="D" Name="Employee Birthdate" ReleaseNo="3.9.4" SeqNo="5770">
     <Comments>Conversion Type for POS</Comments>
     <Step SeqNo="10" StepType="AD">
       <PO AD_Table_ID="101" Action="I" Record_ID="91124" Table="AD_Column">
@@ -41,7 +41,7 @@
         <Data AD_Column_ID="226" Column="AD_Reference_ID">19</Data>
         <Data AD_Column_ID="550" Column="CreatedBy">100</Data>
         <Data AD_Column_ID="552" Column="UpdatedBy">100</Data>
-        <Data AD_Column_ID="6482" Column="EntityType">U</Data>
+        <Data AD_Column_ID="6482" Column="EntityType">D</Data>
         <Data AD_Column_ID="109" Column="AD_Column_ID">91124</Data>
         <Data AD_Column_ID="360" Column="AD_Org_ID">0</Data>
         <Data AD_Column_ID="359" Column="AD_Client_ID">0</Data>

@@ -33,10 +33,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
+import org.adempiere.core.domains.models.I_AD_View_Column;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.adempiere.impexp.ArrayExcelExporter;
-import org.adempiere.model.I_AD_View_Column;
 import org.adempiere.model.MBrowse;
 import org.adempiere.model.MBrowseField;
 import org.adempiere.model.MView;
@@ -1678,13 +1678,12 @@ public abstract class Browser {
 												&& DisplayType.Integer != field.getAD_Reference_ID())))
 							data = new IDColumn(no);
 						else if (DisplayType.YesNo == field.getAD_Reference_ID())
-							data = new Boolean("Y".equals(resultSet
-									.getString(colIndex)));
+							data = Boolean.valueOf("Y".equals(resultSet.getString(colIndex)));
 						else if (DisplayType.isDate(field.getAD_Reference_ID()))
 							data = resultSet.getTimestamp(colIndex);
 						else if(DisplayType.isID(field.getAD_Reference_ID())
 								|| DisplayType.Integer == field.getAD_Reference_ID())
-							data = new Integer(resultSet.getInt(colIndex));
+							data = Integer.valueOf(resultSet.getInt(colIndex));
 						else if (DisplayType.isNumeric(field.getAD_Reference_ID()))
 							data = resultSet.getBigDecimal(colIndex);
 						else

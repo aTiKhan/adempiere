@@ -111,7 +111,7 @@ public class CRP {
 	     long hours = t.getTimeSlotHours();
 		 
 		 DefaultCategoryDataset dataset = new DefaultCategoryDataset();	 
-		 //		Long Hours = new Long(hours); 			 		 			 
+		 //		Long Hours = Long.valueOf(hours);
 		 int C_UOM_ID = DB.getSQLValue(null,"SELECT C_UOM_ID FROM M_Product WHERE S_Resource_ID = ? " , resource.getS_Resource_ID());
 		 MUOM uom = MUOM.get(Env.getCtx(),C_UOM_ID);
 	     if (!uom.isHour())
@@ -122,9 +122,9 @@ public class CRP {
 	     
  		 while(days < 32)
  		 {	
- 		 		String day = new String(new Integer (date.getDate()).toString()); 
+			String day = new String(Integer.valueOf(date.getDate()).toString());
  		 		long HoursLoad = getLoad(resource,date).longValue();
- 		 		Long Hours = new Long(hours); 
+ 		 		Long Hours = Long.valueOf(hours);
  		 		
  		 		switch(gc1.get(Calendar.DAY_OF_WEEK))
 				{
@@ -331,13 +331,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -349,13 +349,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -367,13 +367,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -385,13 +385,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -403,13 +403,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -421,13 +421,13 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
@@ -439,20 +439,20 @@ public class CRP {
 							currentweight -= (dailyCapacity*utilization)/100;
 					        summary += ((dailyCapacity*utilization)/100); 
 
-							dataset.addValue(dailyCapacity ,namepossiblecapacity, new Integer(day));
-							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, new Integer(day) );
+							dataset.addValue(dailyCapacity ,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue((dailyCapacity*utilization)/100, namecapacity, Integer.valueOf(day));
 						}
 						else {
 
-							dataset.addValue(0,namepossiblecapacity, new Integer(day) );
-							dataset.addValue(0, namecapacity, new Integer(day) );
+							dataset.addValue(0,namepossiblecapacity, Integer.valueOf(day));
+							dataset.addValue(0, namecapacity, Integer.valueOf(day));
 						}			
 						
 		 		 		break;					
 				}
 		
- 		 		dataset.addValue(currentweight, nameload, new Integer(day));
-				dataset.addValue(summary, namesummary, new Integer(day) );
+ 		 		dataset.addValue(currentweight, nameload, Integer.valueOf(day));
+				dataset.addValue(summary, namesummary, Integer.valueOf(day));
 
 				gc1.add(Calendar.DATE, 1);
  		 } 	 		 

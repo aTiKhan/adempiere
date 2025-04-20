@@ -214,7 +214,7 @@ public class AMenuStartItem extends Thread implements ActionListener
 		 */
 		private void startWindow(int AD_Workbench_ID, int AD_Window_ID)
 		{
-			AWindow frame = (AWindow)Env.showWindow(AD_Window_ID); 
+			AWindow frame = (AWindow)AEnv.showWindow(AD_Window_ID); 
 			if (frame != null) {
 				menu.getWindowManager().add(frame);
 				return;
@@ -352,7 +352,7 @@ public class AMenuStartItem extends Thread implements ActionListener
 				return;
 			}
 		}
-		//ff = new FormFrame();
+		// ff = new FormFrame(0);
 		SwingUtilities.invokeLater(updateProgressBar);			//	1
 		ff 	= VBrowser.openBrowse(0 , AD_Browse_ID , "", isSOTrx);
 		ff.setVisible(true);

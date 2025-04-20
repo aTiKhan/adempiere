@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.adempiere.core.domains.models.I_C_BankStatement;
 import org.compiere.model.MAccount;
 import org.compiere.model.MAcctSchema;
 import org.compiere.model.MAcctSchemaElement;
@@ -355,7 +356,7 @@ public final class Fact
 			for (int i = 0; i < m_lines.size(); i++)
 			{
 				FactLine line = (FactLine)m_lines.get(i);
-				Integer key = new Integer(line.getAD_Org_ID());
+				Integer key = Integer.valueOf(line.getAD_Org_ID());
 				BigDecimal bal = line.getSourceBalance();
 				BigDecimal oldBal = (BigDecimal)map.get(key);
 				if (oldBal != null)
@@ -422,7 +423,7 @@ public final class Fact
 			for (int i = 0; i < m_lines.size(); i++)
 			{
 				FactLine line = (FactLine)m_lines.get(i);
-				Integer key = new Integer(line.getAD_Org_ID());
+				Integer key = Integer.valueOf(line.getAD_Org_ID());
 			//	BigDecimal balance = line.getSourceBalance();
 				Balance oldBalance = (Balance)map.get(key);
 				if (oldBalance == null)
@@ -683,19 +684,9 @@ public final class Fact
 		for (int i = 0; i < m_lines.size(); i++)
 		{
 			FactLine factLineSource = (FactLine)m_lines.get(i);
-			List<MDistribution> distributions = MDistribution.get (factLineSource.getAccount(),
-				m_postingType, m_doc.getC_DocType_ID(),factLineSource.getDateAcct());
-			//	No Distribution for this line
-			//AZ Goodwill
-			//The above "get" only work in GL Journal because it's using ValidCombination Account
-			//Old:
-			//if (distributions == null || distributions.length == 0)
-			//	continue;
-			//For other document, we try the followings (from FactLine):
-			//New:	
-			if (distributions == null || distributions.size() == 0)
-			{
-				distributions = MDistribution.get (factLineSource.getCtx(), factLineSource.getC_AcctSchema_ID(),
+			List<MDistribution> distributions = MDistribution.get (
+					factLineSource.getCtx(),
+					factLineSource.getC_AcctSchema_ID(),
 					m_postingType, m_doc.getC_DocType_ID(),
 					factLineSource.getAD_Org_ID(), factLineSource.getAccount_ID(),
 					factLineSource.getM_Product_ID(), factLineSource.getC_BPartner_ID(), factLineSource.getC_Project_ID(),
@@ -706,7 +697,7 @@ public final class Fact
 					factLineSource.getDateAcct());
 				if (distributions == null || distributions.size() == 0)
 					continue;
-			}
+
 			//end AZ
 			//	Just the first
 			if (distributions.size() > 1){
@@ -718,7 +709,6 @@ public final class Fact
 			//Set the transaction name based on posting document, if not a null trx name is used based on the cache causing the lock database
 			distribution.set_TrxName(get_TrxName());
 			List<MDistributionLine> distributionLines = distribution.getLines(false);
-
 			if(distribution.getPercentTotal().signum() != 0)
 			{
 			// FR 2685367 - GL Distribution delete line instead reverse
@@ -785,6 +775,8 @@ public final class Fact
 					factLine.setC_LocFrom_ID(factLineSource.getC_LocFrom_ID());
 				if (factLine.getC_LocTo_ID() <= 0 && factLineSource.getC_LocTo_ID() > 0)
 					factLine.setC_LocTo_ID(factLineSource.getC_LocTo_ID());
+				if (factLine.getC_Tax_ID() <= 0 && factLineSource.getC_Tax_ID() > 0)
+					factLine.setC_Tax_ID(factLineSource.getC_Tax_ID());
 
 				factLine.setPostingType(m_postingType);
 				if (distributionLine.isOverwritePostingType()
@@ -823,21 +815,43 @@ public final class Fact
 					factLine.setUser3_ID(distributionLine.getUser3_ID());
 				if(distributionLine.isOverwriteUser4())
 					factLine.setUser4_ID(distributionLine.getUser4_ID());
+
 				// F3P end
 
 				if (distributionLine.isInvertAccountSign()) {
-					if (distributionLine.getAmt() != null && distributionLine.getAmt().signum() < 0)
-						factLine.setAmtSource(factLineSource.getC_Currency_ID(), null, distributionLine.getAmt().abs());
-					else
-						factLine.setAmtSource(factLineSource.getC_Currency_ID(), distributionLine.getAmt(), null);
+					// Original document with inverse accounting sing
+					if (distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() <= 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() ,  null , distributionLine.getAmt().negate());
+					// Original document with inverse accounting sing with negative amount and positive quantity or positive amount and negative quantity
+					if (distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() > 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() ,  null , distributionLine.getAmt().negate());
+					// Reversal document with  inverse accounting sing
+					if (distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() > 0
+					||  distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() < 0)
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() , null , distributionLine.getAmt().negate());
+					if (I_C_BankStatement.Table_ID == m_doc.get_Table_ID() && distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() == 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() ,   distributionLine.getAmt() , null);
+					else if (distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() == 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() ,  null , distributionLine.getAmt().negate());
 				}
 				else
 				{
-					if (distributionLine.getAmt() != null && distributionLine.getAmt().signum() < 0)
-						factLine.setAmtSource(factLineSource.getC_Currency_ID(), null, distributionLine.getAmt().abs());
-					else
-						factLine.setAmtSource(factLineSource.getC_Currency_ID(), distributionLine.getAmt(), null);
+					// Original document without  inverse accounting sing
+					if (distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() >= 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() , distributionLine.getAmt() ,null );
+					// Original document without inverse accounting sing with negative amount and positive quantity or positive amount and negative quantity
+					if (distributionLine.getAmt().signum() > 0 && distributionLine.getQty().signum() < 0
+					||	distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() > 0)
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() ,  distributionLine.getAmt() , null);
+					// Reversal document without  inverse accounting sing
+					if (distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() < 0 )
+						factLine.setAmtSource(factLineSource.getC_Currency_ID(),  distributionLine.getAmt() , null );
+					if (I_C_BankStatement.Table_ID == m_doc.get_Table_ID() && distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() == 0)
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() , null , distributionLine.getAmt().negate());
+					else if (distributionLine.getAmt().signum() < 0 && distributionLine.getQty().signum() == 0)
+						factLine.setAmtSource(factLineSource.getC_Currency_ID() , distributionLine.getAmt() , null);
 				}
+
 
 				factLine.setQty(distributionLine.getQty());
 				//  Convert
